@@ -12,6 +12,7 @@ import { startTracker, boardData, runSnapshots } from './lib/tracker.js';
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(__dir, 'public');
 const PORT = Number(process.env.PORT || 3000);
+const PAUSED = ['1', 'true', 'yes'].includes(String(process.env.PAUSED || '').toLowerCase());   // coming-soon mode: set PAUSED=1 in the environment
 const TREASURY = process.env.TREASURY_ADDRESS;
 const MOCK = pump.MOCK;
 
@@ -132,6 +133,11 @@ const server = http.createServer(async (req, res) => {
   try {
     const u = new URL(req.url, 'http://x');
     const key = `${req.method} ${u.pathname}`;
+    if (PAUSED) {
+      if (u.pathname.startsWith('/api/')) return send(res, 503, { error: 'Belief Pad is paused. Check back soon.' }, { 'Retry-After': '3600' });
+      const ext = path.extname(u.pathname);
+      if (req.method === 'GET' && (!ext || ext === '.html') ) return send(res, 200, fs.readFileSync(path.join(PUBLIC, 'coming-soon.html')), { 'Content-Type': TYPES['.html'], 'Cache-Control': 'no-store' });
+    }
     if (routes[key]) return send(res, 200, await routes[key](req));
     if (u.pathname.startsWith('/api/')) return send(res, 404, { error: 'Not found' });
 
@@ -156,7 +162,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[server] listening on ${PORT}`);
+  console.log(`[server] listening on ${PORT}${PAUSED ? ' (PAUSED: serving the coming-soon page)' : ''}`);
   if (!MOCK) startTracker();
   if (!MOCK && process.env.HELIUS_RPC_URL) pump.sdkReport().then((r) => console.log('[sdk]', JSON.stringify(r))).catch((e) => console.error('[sdk] load failed:', String(e.message).slice(0, 300)));
 });

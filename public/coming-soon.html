@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Belief Pad: coming soon</title>
+<meta name="description" content="The launchpad for coins backed by belief. Coming soon.">
+<meta name="theme-color" content="#FBFBFC">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500&family=Outfit:wght@200;300&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#FBFBFC; --ink:#0B0B0F; --mute:#6B6B78; --line:#E6E6EB; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0B0B0F; --ink:#F3F3F6; --mute:#9A9AA8; --line:#26262E; } }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--ink); font: 400 17px/1.55 'Figtree', Inter, system-ui, sans-serif; display: grid; place-items: center; padding: 24px 16px; }
+  main { text-align: center; max-width: 30em; }
+  .ring { width: 96px; height: 96px; margin: 0 auto 36px; }
+  .ring .track { stroke: var(--line); } .ring .arc { stroke: var(--ink); stroke-dasharray: 0 251.3; animation: fill 2.2s cubic-bezier(.2,.7,.2,1) .2s forwards; }
+  @keyframes fill { to { stroke-dasharray: 196 251.3; } }
+  h1 { font: 200 clamp(40px, 9vw, 68px)/1.05 'Outfit', sans-serif; letter-spacing: -.03em; margin-bottom: 14px; }
+  p { color: var(--mute); margin-bottom: 30px; }
+  a.x { display: inline-block; color: var(--ink); text-decoration: none; border: 1px solid var(--ink); border-radius: 999px; padding: 11px 22px; font-weight: 500; font-size: 15px; }
+  a.x:hover { background: var(--ink); color: var(--bg); }
+  @media (prefers-reduced-motion: reduce) { .ring .arc { animation: none; stroke-dasharray: 196 251.3; } }
+</style>
+</head>
+<body>
+<main>
+  <svg class="ring" viewBox="0 0 100 100" role="img" aria-label="Belief Pad"><circle class="track" cx="50" cy="50" r="40" fill="none" stroke-width="7"/><circle class="arc" cx="50" cy="50" r="40" fill="none" stroke-width="9" stroke-linecap="round" transform="rotate(-90 50 50)"/></svg>
+  <h1>Coming soon.</h1>
+  <p>Belief Pad is the launchpad for coins backed by belief. We are getting things ready.</p>
+  <a class="x" href="https://x.com/BeliefPad" rel="noopener">Follow @BeliefPad on X</a>
+</main>
+</body>
+</html>
