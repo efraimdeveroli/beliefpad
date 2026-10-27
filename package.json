@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "start": "node server.js",
+    "start": "node scripts/inspect-sdk.js; node server.js",
     "inspect-sdk": "node scripts/inspect-sdk.js",
     "test": "MOCK_CHAIN=1 node scripts/smoke.js"
   },
   "dependencies": {
-    "@pump-fun/pump-sdk": "^1.0.0",
+    "@pump-fun/pump-sdk": "4.1.0",
     "@solana/web3.js": "^1.98.0"
   }
 }

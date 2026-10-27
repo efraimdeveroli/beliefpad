@@ -147,5 +147,5 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`[server] listening on ${PORT}`);
-  if (!MOCK && process.env.HELIUS_RPC_URL) pump.sdkReport().then((r) => console.log('[sdk]', JSON.stringify(r))).catch((e) => console.error('[sdk] load failed:', e.message));
+  if (!MOCK && process.env.HELIUS_RPC_URL) pump.sdkReport().then((r) => console.log('[sdk]', JSON.stringify(r))).catch((e) => console.error('[sdk] load failed:', String(e.message).slice(0, 300)));
 });
