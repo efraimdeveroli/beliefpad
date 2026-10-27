@@ -84,7 +84,7 @@
   .nav-right a.xl svg { width: 17px; height: 17px; }
   .nav-right a.xl:hover { color: var(--ink); transform: translateY(-1px); }
   @media (max-width: 560px) { .nav-right a.xl { display: none; }
-    .nav-right { gap: 14px; } .pill { padding: 7px 12px; font-size: 13px; } .cabar { gap: 8px; } .cabar code { font-size: 10.5px; } .cabar a { display: none; } }
+    .nav-right { gap: 14px; } .pill { padding: 7px 12px; font-size: 13px; } .cabar { gap: 8px; } .cabar code { font-size: 10px; overflow: visible; text-overflow: clip; } .cabar a, .cabar .ca-k { display: none; } .cabar { padding: 8px 10px; } }
 
   /* subtle motion */
   .js .rv { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
@@ -251,7 +251,7 @@
       <a href="#fair-play">Fair play</a>
       <a href="#rewards">Rewards</a>
       <a href="#fees">Fees and treasury</a>
-      <a href="#token">$BPAD</a>
+      <a href="#token">$BELIEFPAD</a>
       <a href="#parameters">Parameters</a>
     </nav>
 
@@ -264,7 +264,7 @@
         <ul class="plain">
           <li><b>Launch.</b> Create a coin with a locked fee split. Creators keep most of the fees.</li>
           <li><b>Belief.</b> A score that updates every five minutes. Holders who stay longer and keep their position count for more. Fake and oversized wallets count for less.</li>
-          <li><b>Rewards.</b> The most believed coins are paid every hour and every day, in $BPAD. Half of each payout goes to that coin's holders.</li>
+          <li><b>Rewards.</b> The most believed coins are paid every hour and every day, in $BELIEFPAD. Half of each payout goes to that coin's holders.</li>
         </ul>
       </section>
 
@@ -272,7 +272,7 @@
         <h2>Launching a coin</h2>
         <ol class="steps">
           <li><div><b>Connect a wallet.</b><span>This wallet becomes the creator wallet. It is left out of every Belief count for the coin.</span></div></li>
-          <li><div><b>Stake to launch.</b><span>Stake at least 0.1% of the $BPAD supply (1,000,000 $BPAD). This keeps spam launches off the board.</span></div></li>
+          <li><div><b>Stake to launch.</b><span>Stake at least 0.1% of the $BELIEFPAD supply (1,000,000 $BELIEFPAD). This keeps spam launches off the board.</span></div></li>
           <li><div><b>Describe the coin.</b><span>Name, ticker, image and a short description. We pin the image and metadata ourselves so they don't depend on a public gateway.</span></div></li>
           <li><div><b>Lock the fee split.</b><span>The standard split is 70% to you and 30% to the Belief Pad treasury. Creators who stake 1% of supply or more launch with 80/20. The split is set once, at launch, and nobody can change it afterward, including us.</span></div></li>
           <li><div><b>Launch on pump.fun.</b><span>Creating the coin and locking the split happen in one flow, so a coin is never left unlocked. An optional first buy is a second approval in your wallet.</span></div></li>
@@ -392,7 +392,7 @@
 
       <section id="rewards">
         <h2>Rewards</h2>
-        <p>Rewards are paid in $BPAD. Pools fill from the treasury's share of fees (see below): 25% of the rewards bucket goes to the hourly pool and 75% to the daily pool.</p>
+        <p>Rewards are paid in $BELIEFPAD. Pools fill from the treasury's share of fees (see below): 25% of the rewards bucket goes to the hourly pool and 75% to the daily pool.</p>
         <div class="tw"><table class="t" aria-label="Reward shares by place">
           <thead><tr><th>Place</th><th class="n">Hourly pool</th><th class="n">Daily pool</th></tr></thead>
           <tbody>
@@ -428,7 +428,7 @@
           <thead><tr><th>Goes to</th><th class="n">Of the treasury</th><th class="n">Of all fees</th></tr></thead>
           <tbody>
             <tr><td>Creator</td><td class="n">&mdash;</td><td class="n">70%</td></tr>
-            <tr><td><span class="sw s1"></span>Buy and burn $BPAD</td><td class="n">40%</td><td class="n">12%</td></tr>
+            <tr><td><span class="sw s1"></span>Buy and burn $BELIEFPAD</td><td class="n">40%</td><td class="n">12%</td></tr>
             <tr><td><span class="sw s2"></span>Belief rewards</td><td class="n">30%</td><td class="n">9%</td></tr>
             <tr><td><span class="sw s3"></span>Staker rewards</td><td class="n">20%</td><td class="n">6%</td></tr>
             <tr><td><span class="sw s4"></span>Operations</td><td class="n">10%</td><td class="n">3%</td></tr>
@@ -440,7 +440,7 @@
       </section>
 
       <section id="token">
-        <h2>$BPAD</h2>
+        <h2>$BELIEFPAD</h2>
         <p>Supply is 1,000,000,000, fair-launched on pump.fun with no presale. If any team allocation is bought at launch, it is capped at 5% and disclosed before launch.</p>
         <div class="tw"><table class="t" aria-label="Allocation">
           <thead><tr><th>Allocation</th><th class="n">Share of supply</th></tr></thead>
@@ -451,15 +451,15 @@
             <tr class="sum"><td>Total, at most</td><td class="n">5%</td></tr>
           </tbody>
         </table></div>
-        <h3>What $BPAD is used for</h3>
+        <h3>What $BELIEFPAD is used for</h3>
         <ul class="plain">
           <li><b>Stake to launch.</b> 0.1% of supply to list a coin.</li>
           <li><b>Lower fee share.</b> Creators who stake 1% launch with an 80/20 split instead of 70/30.</li>
-          <li><b>Spotlight.</b> Burn $BPAD to pin a coin to the top of the home page for 24 hours.</li>
+          <li><b>Spotlight.</b> Burn $BELIEFPAD to pin a coin to the top of the home page for 24 hours.</li>
           <li><b>Staker rewards.</b> 6% of all fees, paid daily to stakers, plus an early look at rising coins.</li>
-          <li><b>Rewards currency.</b> Hourly and daily payouts are in $BPAD, so every payout is also a purchase.</li>
+          <li><b>Rewards currency.</b> Hourly and daily payouts are in $BELIEFPAD, so every payout is also a purchase.</li>
         </ul>
-        <p>The loop: more launches bring more fees, more fees fund more burns and rewards, and a stronger $BPAD gives creators more reason to launch here.</p>
+        <p>The loop: more launches bring more fees, more fees fund more burns and rewards, and a stronger $BELIEFPAD gives creators more reason to launch here.</p>
       </section>
 
       <section id="parameters">
@@ -509,9 +509,9 @@
 
 <script>
   const DATA = {"sybil": {"wallets": 500, "honest": 519, "clustered": 148, "eff": 22.4}, "coins": [{"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}, {"n": "Ironwill", "t": "IRON", "H": 4812, "mu": 6.2, "R": 0.91, "Q": 1.3, "top10": 0.19, "age": 19.5, "mc": "$968K", "d": 42, "b": 849, "w": 1.035, "B": 4982, "reach": 0.849, "spread": 1.0, "spark": [null, null, null, null, 411.9, 476.1, 536.0, 597.7, 618.4, 665.0, 695.8, 710.7, 737.5, 736.7, 750.9, 768.8, 798.0, 796.9, 799.8, 817.2, 817.2, 815.5, 839.8, 849], "creator": "brZN…hFgt", "mint": "sqwD…pump", "b0": 807}, {"n": "Quiet Hands", "t": "HANDS", "H": 3906, "mu": 8.1, "R": 0.96, "Q": 1.3, "top10": 0.21, "age": 40.2, "mc": "$1.08M", "d": -6, "b": 821, "w": 1.119, "B": 4372, "reach": 0.832, "spread": 0.988, "spark": [785.1, 802.2, 803.6, 820.5, 817.1, 801.2, 831.0, 797.5, 810.9, 825.8, 801.9, 816.4, 798.7, 824.9, 829.3, 821.9, 834.6, 811.9, 827.7, 823.8, 823.4, 818.4, 834.3, 821], "creator": "tGuS…ptFD", "mint": "aYPo…pump", "b0": 827}, {"n": "Paper Lantern", "t": "LANTERN", "H": 2874, "mu": 5.5, "R": 0.9, "Q": 1.25, "top10": 0.22, "age": 14.8, "mc": "$612K", "d": 9, "b": 751, "w": 0.97, "B": 2789, "reach": 0.77, "spread": 0.975, "spark": [null, null, null, null, null, null, null, null, null, 389.0, 448.7, 481.2, 537.1, 569.6, 608.5, 628.0, 631.6, 652.0, 676.0, 666.4, 691.9, 690.4, 696.0, 751], "creator": "22sJ…XHDm", "mint": "fPVt…pump", "b0": 742}, {"n": "Slow Burn", "t": "SLOW", "H": 2190, "mu": 9.3, "R": 0.94, "Q": 1.3, "top10": 0.24, "age": 36.7, "mc": "$403K", "d": -12, "b": 714, "w": 1.108, "B": 2426, "reach": 0.751, "spread": 0.95, "spark": [669.2, 693.2, 701.0, 677.7, 682.2, 687.3, 689.9, 701.0, 706.6, 696.7, 688.9, 704.7, 703.9, 711.8, 726.2, 717.5, 711.8, 715.8, 718.3, 696.4, 726.8, 722.8, 726.3, 714], "creator": "gzgv…1XiP", "mint": "ti6v…pump", "b0": 726}, {"n": "Tidepool", "t": "TIDE", "H": 2900, "mu": 4.9, "R": 0.88, "Q": 1.2, "top10": 0.27, "age": 12.1, "mc": "$744K", "d": 27, "b": 694, "w": 0.896, "B": 2598, "reach": 0.761, "spread": 0.912, "spark": [null, null, null, null, null, null, null, null, null, null, null, 322.9, 369.3, 419.7, 463.8, 510.6, 519.7, 554.5, 578.5, 606.5, 620.0, 634.4, 627.0, 694], "creator": "oPQ6…F7FX", "mint": "DNEX…pump", "b0": 667}, {"n": "Kettle", "t": "KETTLE", "H": 1844, "mu": 3.6, "R": 0.87, "Q": 1.2, "top10": 0.23, "age": 8.4, "mc": "$287K", "d": 5, "b": 663, "w": 0.83, "B": 1531, "reach": 0.689, "spread": 0.963, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 320.1, 372.3, 410.3, 459.2, 477.2, 503.6, 529.7, 547.4, 663], "creator": "j8Rs…nqDX", "mint": "yCUs…pump", "b0": 658}, {"n": "Dusk Mail", "t": "DUSK", "H": 1302, "mu": 5.0, "R": 0.9, "Q": 1.25, "top10": 0.26, "age": 17.3, "mc": "$191K", "d": -3, "b": 611, "w": 0.957, "B": 1246, "reach": 0.661, "spread": 0.925, "spark": [null, null, null, null, null, null, 293.0, 334.4, 377.2, 413.9, 443.8, 463.2, 502.0, 524.1, 525.8, 539.2, 539.2, 548.8, 563.3, 567.6, 589.5, 574.9, 574.7, 611], "creator": "B92A…ezWt", "mint": "iAgu…pump", "b0": 614}, {"n": "Oat Milk Capital", "t": "OAT", "H": 2467, "mu": 2.8, "R": 0.84, "Q": 1.15, "top10": 0.38, "age": 6.9, "mc": "$356K", "d": 31, "b": 548, "w": 0.711, "B": 1754, "reach": 0.707, "spread": 0.775, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 282.1, 320.2, 355.8, 382.9, 412.0, 424.9, 548], "creator": "hN6t…oSWS", "mint": "p6oB…pump", "b0": 517}, {"n": "Mooncrumb", "t": "CRUMB", "H": 1017, "mu": 3.2, "R": 0.86, "Q": 1.2, "top10": 0.29, "age": 5.6, "mc": "$144K", "d": 11, "b": 534, "w": 0.794, "B": 807, "reach": 0.602, "spread": 0.888, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 268.6, 303.6, 344.3, 364.0, 398.1, 534], "creator": "fXjP…Acc9", "mint": "21to…pump", "b0": 523}], "warming": [{"n": "Moss & Co", "t": "MOSS", "age_min": 34, "H": 11}, {"n": "Night Shift", "t": "NIGHT", "age_min": 52, "H": 14}, {"n": "Pebble", "t": "PEBBLE", "age_min": 19, "H": 6}], "ttable": [[0.25, "15 min", 0.132], [0.5, "30 min", 0.244], [1, "1 hour", 0.42], [2, "2 hours", 0.638], [3, "3 hours", 0.754], [6, "6 hours", 0.872], [12, "12 hours", 0.925], [24, "24 hours", 1.0]], "const": {"tau": 1.5, "fast": 0.85, "slow": 0.15, "dust": 10, "scale": 10, "bmax": 15000, "free": 0.2, "floor": 0.4}, "example": {"top": {"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}}};
-  // Contract address. Paste the BPAD mint address between the quotes when the coin launches.
+  // Contract address. Contract address of the BELIEFPAD coin.
   // Leave it empty and the bar stays hidden.
-  const CA = '';
+  const CA = 'BFKPwXQD8FnZHeVyEnM2KJSm8BPkYtacTP3UgtpBpump';
   (function () {
     const bar = document.getElementById('cabar');
     if (!bar || !CA) return;

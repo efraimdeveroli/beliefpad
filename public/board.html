@@ -84,7 +84,7 @@
   .nav-right a.xl svg { width: 17px; height: 17px; }
   .nav-right a.xl:hover { color: var(--ink); transform: translateY(-1px); }
   @media (max-width: 560px) { .nav-right a.xl { display: none; }
-    .nav-right { gap: 14px; } .pill { padding: 7px 12px; font-size: 13px; } .cabar { gap: 8px; } .cabar code { font-size: 10.5px; } .cabar a { display: none; } }
+    .nav-right { gap: 14px; } .pill { padding: 7px 12px; font-size: 13px; } .cabar { gap: 8px; } .cabar code { font-size: 10px; overflow: visible; text-overflow: clip; } .cabar a, .cabar .ca-k { display: none; } .cabar { padding: 8px 10px; } }
 
   /* subtle motion */
   .js .rv { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
@@ -300,9 +300,9 @@
 
 
 <script>
-  // Contract address. Paste the BPAD mint address between the quotes when the coin launches.
+  // Contract address. Contract address of the BELIEFPAD coin.
   // Leave it empty and the bar stays hidden.
-  const CA = '';
+  const CA = 'BFKPwXQD8FnZHeVyEnM2KJSm8BPkYtacTP3UgtpBpump';
   (function () {
     const bar = document.getElementById('cabar');
     if (!bar || !CA) return;
