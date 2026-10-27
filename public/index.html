@@ -170,6 +170,18 @@
   .ring-coin a { color: var(--ink); }
   .rank .new { font: 600 9px var(--body); font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
 
+  .lead { max-width: 34em; color: var(--mute); font-size: 18px; margin-bottom: 8px; }
+  .steps4 { list-style: none; padding: 0; margin-left: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(20px, 3vw, 40px); margin-top: 30px; }
+  .steps4 li { border-top: 1px solid var(--ink); padding-top: 16px; }
+  .steps4 span { display: block; font: 300 15px var(--mono); color: var(--mute); margin-bottom: 10px; }
+  .steps4 h3 { font: 400 22px var(--display); margin-bottom: 8px; }
+  .steps4 p { color: var(--mute); font-size: 15px; }
+  .who { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 4vw, 56px); margin-top: 48px; padding: 28px 0 0; border-top: 1px solid var(--line); }
+  .who h3 { font: 400 20px var(--display); margin-bottom: 8px; }
+  .who p { color: var(--mute); font-size: 16px; max-width: 24em; }
+  @media (max-width: 860px) { .steps4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .steps4 { grid-template-columns: 1fr; gap: 24px; } .who { grid-template-columns: 1fr; gap: 24px; } }
+
 </style>
 </head>
 <body>
@@ -199,7 +211,7 @@
 <div class="wrap">
   <header class="hero">
     <h1>Nothing ranks higher than belief.</h1>
-    <p class="sub">Launch your coin on pump.fun through Belief Pad. We rank every coin by how many people hold it, and for how long.</p>
+    <p class="sub">The launchpad that rewards belief. Launch a coin on pump.fun and we rank it by how many people hold it, and for how long. The most believed coins are paid every hour and every day, shared between the creator and the people who hold.</p>
     <div class="cta">
       <a class="btn-solid" href="launch.html">Launch a coin</a>
       <a class="btn-text" href="board.html">See the board</a>
@@ -217,6 +229,32 @@
       </div>
     </div>
   </header>
+
+  <section id="value">
+    <div class="head"><h2 class="sec">Get rewarded based on belief</h2></div>
+    <p class="lead">On most launchpads, a coin is paid attention for a few minutes and then forgotten. Here, the coins with the most real, lasting support rise to the top and get rewarded for it.</p>
+    <ol class="steps4">
+      <li><span>1</span><h3>Launch</h3><p>Create your coin on pump.fun in one step, without leaving the site.</p></li>
+      <li><span>2</span><h3>Hold</h3><p>Every holder adds belief. The longer they hold, and the more they keep, the more it counts.</p></li>
+      <li><span>3</span><h3>Rank</h3><p>Belief is scored out of 1,000 and refreshed every 5 minutes on the public board.</p></li>
+      <li><span>4</span><h3>Get paid</h3><p>The most believed coins share a reward each hour and a bigger one each day.</p></li>
+    </ol>
+    <div class="who">
+      <div>
+        <h3>If you launch</h3>
+        <p>Keep 70% of your coin's trading fees, locked on-chain when you launch. When your coin ranks, you also take half of its reward.</p>
+      </div>
+      <div>
+        <h3>If you hold</h3>
+        <p>Holders of a ranked coin share the other half of its reward, in proportion to how long and how much they hold. You are paid for holding, not for flipping.</p>
+      </div>
+      <div>
+        <h3>If you are watching</h3>
+        <p>The board shows which coins people actually stick with. Open any coin to see exactly how its score is built.</p>
+      </div>
+    </div>
+    <a class="more" href="docs.html#rewards">How rewards work</a>
+  </section>
 
   <section id="board">
     <div class="head">
@@ -247,7 +285,7 @@
   </section>
 
   <section class="close">
-    <p class="big">The most believed coins get paid every hour.</p>
+    <p class="big">Launch it. Hold it. Get rewarded for belief.</p>
     <p class="small">Creators keep 70% of their coin's fees. The top coins share a reward each hour and a bigger one each day.</p>
     <a class="btn-solid" href="launch.html">Launch a coin</a>
   </section>
