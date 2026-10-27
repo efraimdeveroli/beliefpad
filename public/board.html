@@ -274,7 +274,7 @@
   <section class="blk" id="warming">
     <div class="head">
       <h2 class="sec">Warming up</h2>
-      <div class="meta">Every coin appears the moment it launches. It gets a rank after one hour and 15 holders.</div>
+      <div class="meta">Every coin appears the moment it launches. It gets a rank after 15 minutes and 15 holders.</div>
     </div>
     <div class="warm" id="warmGrid"></div>
     <p class="empty-note" id="warmEmpty" hidden>No coins are warming up right now.</p>
@@ -482,10 +482,10 @@
   function renderWarming() {
     document.getElementById('warmEmpty').hidden = warming.length > 0;
     document.getElementById('warmGrid').innerHTML = warming.map(w => {
-      const tPct = Math.min(100, w.age_min / 60 * 100), hPct = Math.min(100, w.H / 15 * 100);
+      const tPct = Math.min(100, w.age_min / 15 * 100), hPct = Math.min(100, w.H / 15 * 100);
       return `<div><div class="who">${esc(w.n)}<small>$${esc(w.t)}</small></div>
         <div class="prog">
-          <div>${Math.min(w.age_min, 60)} of 60 minutes</div><div class="bar"><i class="${tPct >= 100 ? 'done' : ''}" style="width:${tPct}%"></i></div>
+          <div>${Math.min(w.age_min, 15)} of 15 minutes</div><div class="bar"><i class="${tPct >= 100 ? 'done' : ''}" style="width:${tPct}%"></i></div>
           <div>${w.H} of 15 holders</div><div class="bar"><i class="${hPct >= 100 ? 'done' : ''}" style="width:${hPct}%"></i></div>
         </div></div>`;
     }).join('');
