@@ -454,6 +454,7 @@
     r.innerHTML = `<h2>One step left</h2><p>${pending === 'resume' ? 'Connect the wallet you launched with, then press the button to lock the fee split for this coin. It joins the board after that.' : pending ? 'Solana is slow right now. ' + (reason || '') + ' Once it lands, press the button to lock the fee split. It joins the board after that.' : 'Your coin was created, but its fee split is not locked yet (' + (reason || 'not confirmed') + '). It joins the board once you finish.'}</p>
       <button class="btn-solid" id="finish" type="button">Finish setup</button><p class="err" id="finErr"></p>`;
     $('finish').onclick = async () => {
+      if (!pub) { $('finErr').textContent = 'Connect your wallet first (top right).'; return; }
       $('finish').disabled = true; $('finErr').textContent = '';
       try {
         const f = await api('/api/launch/finish', { mint, creator: pub });
@@ -464,7 +465,7 @@
     };
   }
 
-  { const m = new URLSearchParams(location.search).get('finish'); if (m && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(m)) { form.style.display = 'none'; finishPrompt(m, '', 'resume'); } }
+  { const m = new URLSearchParams(location.search).get('finish'); if (m && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(m)) { form.style.display = 'none'; $('progress').hidden = false; if ($('steps')) $('steps').hidden = true; finishPrompt(m, '', 'resume'); $('progress').scrollIntoView({ block: 'center' }); } }
 
   async function done(mint, name, buySol) {
     const r = $('result'); r.hidden = false;
