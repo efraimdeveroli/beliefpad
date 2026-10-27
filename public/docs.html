@@ -277,7 +277,7 @@
           <li><div><b>Lock the fee split.</b><span>The standard split is 70% to you and 30% to the Belief Pad treasury. Creators who stake 1% of supply or more launch with 80/20. The split is set once, at launch, and nobody can change it afterward, including us.</span></div></li>
           <li><div><b>Launch on pump.fun.</b><span>Creating the coin and locking the split happen in one flow, so a coin is never left unlocked. An optional first buy is a second approval in your wallet.</span></div></li>
           <li><div><b>We check the lock.</b><span>Before listing, Belief Pad reads the coin's fee-sharing setup on-chain. If the split isn't the one you chose, or can still be changed, the coin is not listed. If a coin was created but not locked, you can retry the setup.</span></div></li>
-          <li><div><b>Warm up.</b><span>New coins sit under "Warming up" until they are 15 minutes old and have 15 qualifying holders. Then they get a rank.</span></div></li>
+          <li><div><b>Warm up.</b><span>New coins sit under "Warming up" until they are 15 minutes old and have 5 qualifying holders. Then they get a rank.</span></div></li>
         </ol>
         <p class="m">Creator fees collect in a per-coin vault until they are distributed. Belief Pad runs the distribution on a schedule, and anyone can trigger it.</p>
       </section>
@@ -367,7 +367,7 @@
         <h2>Rankings</h2>
         <ul class="plain">
           <li><b>Snapshots.</b> Belief is calculated every 5 minutes. The score on the board is the average of the last three snapshots (15 minutes), so the board moves without flickering.</li>
-          <li><b>Who ranks.</b> A coin ranks once it is at least 15 minutes old and has 15 qualifying holders. Until then it shows under "Warming up" with its progress.</li>
+          <li><b>Who ranks.</b> A coin ranks once it is at least 15 minutes old and has 5 qualifying holders. Until then it shows under "Warming up" with its progress.</li>
           <li><b>Sorting.</b> The board sorts by Belief by default. "Rising" sorts by the biggest 15-minute change and "Newest" by launch time.</li>
           <li><b>Ties.</b> Equal scores are ordered by more belief points, then by longer typical hold time.</li>
           <li><b>Rings.</b> Each score has a ring that fills as it grows. A coin earns Lit at 250, Diamond at 500 and Crown at 800.</li>
@@ -477,7 +477,7 @@
             <tr><td>Concentration threshold</td><td>20%</td><td>Top-10 share with no penalty</td></tr>
             <tr><td>Spread floor</td><td>0.40</td><td>Most a concentration penalty can remove</td></tr>
             <tr><td>Cluster weight</td><td>√n</td><td>How a group of linked wallets counts</td></tr>
-            <tr><td>Ranking gate</td><td>15 minutes, 15 holders</td><td>When a coin gets a rank (it is listed from launch)</td></tr>
+            <tr><td>Ranking gate</td><td>15 minutes, 5 holders</td><td>When a coin gets a rank (it is listed from launch)</td></tr>
             <tr><td>Snapshot and smoothing</td><td>5 minutes, 3 snapshots</td><td>How often Belief updates and how it is averaged</td></tr>
             <tr><td>Reward wait</td><td>30 minutes</td><td>Minimum hold to share in holder rewards</td></tr>
             <tr><td>Launch stake</td><td>0.1% of supply</td><td>What a creator stakes to launch</td></tr>
@@ -612,7 +612,7 @@
       $('cNum').textContent = b;
       arc.style.strokeDashoffset = ring * (1 - b / 1000);
       let where;
-      if (H < 15) where = 'Needs 15 holders to be ranked.';
+      if (H < 5) where = 'Needs 5 holders to be ranked.';
       else if (b >= board[0].b) where = 'Would rank above ' + board[0].n + ' (' + board[0].b + ').';
       else if (b < board[board.length - 1].b) where = 'Would rank below ' + board[board.length - 1].n + ' (' + board[board.length - 1].b + ') on today’s board.';
       else {
