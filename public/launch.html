@@ -464,7 +464,7 @@
     };
   }
 
-  { const m = new URLSearchParams(location.search).get('finish'); if (m && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(m)) { form.hidden = true; finishPrompt(m, '', 'resume'); } }
+  { const m = new URLSearchParams(location.search).get('finish'); if (m && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(m)) { form.style.display = 'none'; finishPrompt(m, '', 'resume'); } }
 
   async function done(mint, name, buySol) {
     const r = $('result'); r.hidden = false;
