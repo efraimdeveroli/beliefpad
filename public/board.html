@@ -220,6 +220,7 @@
   .empty { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 56px 0; text-align: center; color: var(--mute); }
   .empty p { margin-bottom: 18px; }
   .empty-note { color: var(--mute); }
+  .rank .new { font: 600 9px var(--body); font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
 
 </style>
 </head>
@@ -273,7 +274,7 @@
   <section class="blk" id="warming">
     <div class="head">
       <h2 class="sec">Warming up</h2>
-      <div class="meta">Coins join the board after one hour and 15 holders.</div>
+      <div class="meta">Every coin appears the moment it launches. It gets a rank after one hour and 15 holders.</div>
     </div>
     <div class="warm" id="warmGrid"></div>
     <p class="empty-note" id="warmEmpty" hidden>No coins are warming up right now.</p>
@@ -375,7 +376,7 @@
 
 
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let coins = [], warming = [], nextAt = 0, sortBy = 'belief', openM = null, prev = {};
+  let coins = [], warming = [], nextAt = 0, sortBy = 'belief', openM = decodeURIComponent(location.hash.slice(1)) || null, prev = {};
   const list = document.getElementById('list');
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const fmt = n => Math.round(n).toLocaleString('en-US');
@@ -439,17 +440,17 @@
   }
 
   function render() {
-    document.getElementById('ranked').textContent = coins.length;
+    document.getElementById('ranked').textContent = coins.filter(c => c.ranked).length;
     const focusM = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.m : null;
     if (!coins.length) {
-      list.innerHTML = `<div class="empty"><p>${warming.length ? 'No coin has reached the board yet. Coins join after one hour and 15 holders.' : 'No coins have launched yet.'}</p><a class="btn-solid" href="launch.html">Launch a coin</a></div>`;
+      list.innerHTML = `<div class="empty"><p>${warming.length ? 'No coins have launched yet.' : 'No coins have launched yet.'}</p><a class="btn-solid" href="launch.html">Launch a coin</a></div>`;
       return;
     }
-    const sorted = [...coins].sort((a, z) => sortBy === 'belief' ? z.b - a.b : sortBy === 'rising' ? z.d - a.d : a.age - z.age);
+    const sorted = [...coins].sort((a, z) => sortBy === 'new' ? a.age - z.age : (z.ranked - a.ranked) || (sortBy === 'rising' ? z.d - a.d : z.b - a.b));
     list.innerHTML = sorted.map((c, i) => `
       <div class="item">
         <button class="row" data-m="${c.mint}" aria-expanded="${openM === c.mint}" aria-controls="d-${c.mint}">
-          <span class="rank">${i + 1}</span>
+          <span class="rank">${c.ranked ? sorted.filter(x => x.ranked).indexOf(c) + 1 : '<em class="new">New</em>'}</span>
           <span class="name"><img class="coin" src="${esc(c.image)}" alt="" onerror="this.remove()">${esc(c.n)}<small>$${esc(c.t)}</small></span>
           <span class="spark">${sparkSVG(c)}</span>
           <span class="score">${ring(c.b / 1000, 22)}<b>${c.b}</b></span>
@@ -500,6 +501,7 @@
       const d = await (await fetch('/api/board', { cache: 'no-store' })).json();
       coins = d.coins; warming = d.warming; nextAt = d.nextSnapshotAt;
       render(); renderWarming();
+      if (openM && !window.__scrolled) { const el = document.getElementById('d-' + openM); if (el) { window.__scrolled = true; el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } }
     } catch (e) { /* keep what is on screen */ }
   }
   const pad = n => String(n).padStart(2, '0');

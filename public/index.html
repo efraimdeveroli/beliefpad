@@ -168,6 +168,7 @@
   .empty { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 44px 0; text-align: center; color: var(--mute); }
   .empty p { margin-bottom: 18px; }
   .ring-coin a { color: var(--ink); }
+  .rank .new { font: 600 9px var(--body); font-style: normal; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); white-space: nowrap; }
 
 </style>
 </head>
@@ -355,13 +356,13 @@
       num.textContent = '—';
       document.getElementById('ringLabel').textContent = 'The board opens with the first coins';
       document.getElementById('ringCoin').innerHTML = d.total ? d.total + ' warming up' : '<a href="launch.html">Launch the first coin</a>';
-      rows.innerHTML = '<div class="empty"><p>' + (d.total ? 'Coins join the board after one hour and 15 holders.' : 'No coins have launched yet.') + '</p><a class="btn-solid" href="launch.html">Launch a coin</a></div>';
+      rows.innerHTML = '<div class="empty"><p>' + (d.total ? 'Coins appear here the moment they launch.' : 'No coins have launched yet.') + '</p><a class="btn-solid" href="launch.html">Launch a coin</a></div>';
       return;
     }
     document.getElementById('ringCoin').innerHTML = esc(COINS[0].n) + ' <span>$' + esc(COINS[0].t) + '</span>';
     rows.innerHTML = COINS.map((c, i) => `
       <a class="row" href="board.html">
-        <div class="rank">${i + 1}</div>
+        <div class="rank">${c.ranked ? i + 1 : '<em class="new">New</em>'}</div>
         <div class="name">${esc(c.n)}<span>$${esc(c.t)}</span></div>
         <div class="bar"><i data-i="${i}"></i></div>
         <div class="score">${c.b}</div>

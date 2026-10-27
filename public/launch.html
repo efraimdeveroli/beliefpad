@@ -469,7 +469,7 @@
     r.innerHTML = `<h2>${name.replace(/[<>&]/g, '')} is live</h2>
       <p>Fee split locked: 70% to you, 30% to Belief Pad.</p>
       <p class="mint"><code>${mint}</code></p>
-      <div class="acts"><a class="btn-solid" href="https://pump.fun/coin/${mint}" target="_blank" rel="noopener">Open on pump.fun</a><a class="btn-text" href="board.html">See the board</a></div>
+      <div class="acts"><a class="btn-solid" href="https://pump.fun/coin/${mint}" target="_blank" rel="noopener">Open on pump.fun</a><a class="btn-text" href="board.html#${mint}">See it on the board</a></div>
       <p id="buyNote" class="m"></p>`;
     if (buySol > 0) {
       $('buyNote').textContent = 'Approve your first buy in your wallet…';
