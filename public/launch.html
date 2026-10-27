@@ -4,20 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Launch · Belief Pad</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Outfit:wght@200;300;400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="theme-color" content="#FBFBFC">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Outfit:wght@200;300;400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><meta name="theme-color" content="#0B0B0F">
 <style>
   :root {
-    --bg: #FBFBFC;
-    --ink: #0B0B0F;
-    --mute: #6B6B78;
-    --line: #E6E6EB;
-    --wash: #F3F3F6;
-    --up: #0E8A4F;
-    --down: #B4232C;
+    --bg: #0B0B0F;
+    --ink: #F3F3F6;
+    --mute: #9A9AA8;
+    --line: #26262E;
+    --wash: #15151B;
+    --up: #3DDC8B;
+    --down: #FF7A82;
     --display: 'Outfit', system-ui, sans-serif;
     --ui: 'Figtree', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
     --gutter: clamp(16px, 4vw, 48px);
+    color-scheme: dark;
   }
   * { box-sizing: border-box; margin: 0; }
   html { scroll-behavior: smooth; }
@@ -51,7 +52,7 @@
     display: inline-block; background: var(--ink); color: var(--bg); text-decoration: none; font: 500 15px var(--ui);
     padding: 14px 28px; border-radius: 999px; transition: transform .15s, box-shadow .15s;
   }
-  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(11,11,15,.18); }
+  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.55); }
   .btn-text { font: 500 15px var(--ui); text-underline-offset: 5px; text-decoration-thickness: 1px; }
 
   /* shared bits */
@@ -120,17 +121,17 @@
   .field { display: grid; gap: 8px; }
   .field > label, summary { font: 500 14px var(--ui); }
   label span, summary span { color: var(--mute); font-weight: 400; margin-left: 6px; }
-  input, textarea { font: 400 16px var(--ui); color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; width: 100%; transition: border-color .15s; }
+  input, textarea { font: 400 16px var(--ui); color: var(--ink); background: var(--wash); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; width: 100%; transition: border-color .15s; }
   textarea { resize: vertical; }
-  input:hover, textarea:hover { border-color: #cfcfd8; }
+  input:hover, textarea:hover { border-color: #3A3A44; }
   input:focus, textarea:focus { outline: none; border-color: var(--ink); }
-  input::placeholder, textarea::placeholder { color: #a5a5b0; }
+  input::placeholder, textarea::placeholder { color: #6B6B78; }
   .two { display: grid; grid-template-columns: 1fr 150px; gap: 14px; }
   .hint { color: var(--mute); font-size: 13px; }
   .err { color: var(--down); font-size: 13px; min-height: 0; }
   .err:empty { display: none; }
 
-  .drop { display: grid; place-items: center; width: 160px; height: 160px; border: 1px dashed #c4c4ce; border-radius: 50%; cursor: pointer; overflow: hidden; text-align: center; color: var(--mute); font: 500 15px var(--ui); transition: border-color .15s, background .15s; }
+  .drop { display: grid; place-items: center; width: 160px; height: 160px; border: 1px dashed #3A3A44; border-radius: 50%; cursor: pointer; overflow: hidden; text-align: center; color: var(--mute); font: 500 15px var(--ui); transition: border-color .15s, background .15s; }
   .drop:hover, .sr:focus-visible + .drop { border-color: var(--ink); background: var(--wash); }
   .drop small { display: block; font-weight: 400; font-size: 12px; margin-top: 4px; padding: 0 22px; }
   .drop img { width: 100%; height: 100%; object-fit: cover; }
@@ -143,7 +144,7 @@
   details.more .field { margin-top: 14px; }
 
   .buy { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .presets { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; }
+  .presets { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; background: var(--wash); }
   .presets button { border: 0; background: none; font: 500 14px var(--ui); color: var(--mute); padding: 9px 16px; cursor: pointer; transition: background .15s, color .15s; }
   .presets button + button { border-left: 1px solid var(--line); }
   .presets button.on { background: var(--ink); color: var(--bg); }
@@ -157,7 +158,7 @@
   .side { position: sticky; top: 24px; }
   .side h2 { font: 300 26px var(--display); margin-bottom: 18px; }
   .split { display: flex; gap: 3px; height: 34px; margin-bottom: 18px; }
-  .split i { display: block; background: var(--ink); } .split i + i { background: rgba(11,11,15,.2); }
+  .split i { display: block; background: var(--ink); } .split i + i { background: rgba(243,243,246,.22); }
   ul.plain { list-style: none; padding: 0; margin: 0 0 16px; }
   ul.plain li { padding: 13px 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.55; }
   ul.plain li:last-child { border-bottom: 1px solid var(--line); }
@@ -194,7 +195,7 @@
 <div class="wrap">
   <nav class="nav" aria-label="Main">
     <a class="brand" href="index.html">
-      <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>
+      <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#2A2A33" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#F3F3F6" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>
       <span>Belief Pad</span>
     </a>
     <div class="nav-right">
@@ -281,7 +282,7 @@
   <div class="wrap">
     <div class="row1">
       <div class="fbrand">
-        <a class="fb" href="index.html"><svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>Belief Pad</a>
+        <a class="fb" href="index.html"><svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#2A2A33" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#F3F3F6" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>Belief Pad</a>
         <span class="tag">Nothing ranks higher than belief.</span>
       </div>
       <div class="links"><a href="board.html">Board</a><a href="docs.html">Docs</a><a href="docs.html#parameters">Parameters</a><a href="https://x.com/BeliefPad" target="_blank" rel="noopener">X</a></div>
