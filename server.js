@@ -105,6 +105,9 @@ const routes = {
     const coin = isPubkey(b.mint) && store.getCoin(b.mint);
     if (!coin || coin.creator !== b.creator || coin.status === 'locked') throw Object.assign(new Error('Nothing to finish for this coin.'), { status: 400 });
     if (!MOCK && !(await pump.curveReserves(b.mint).catch(() => null))) throw Object.assign(new Error('Your coin did not land on Solana. Nothing was charged. Launch again.'), { status: 409 });
+    // the lock may already be on chain (an earlier send landed late): list the coin instead of building it again
+    const already = await lockAndList(b.mint, b.creator).catch(() => ({ ok: false }));
+    if (already.ok) return { mint: b.mint, locked: true };
     prepared.set(b.mint, { creator: b.creator, at: Date.now() });
     const r = await pump.buildLock({ creator: b.creator, mint: b.mint, treasury: TREASURY });
     return { mint: b.mint, txs: r.txs };

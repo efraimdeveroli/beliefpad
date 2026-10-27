@@ -458,6 +458,7 @@
       $('finish').disabled = true; $('finErr').textContent = '';
       try {
         const f = await api('/api/launch/finish', { mint, creator: pub });
+        if (f.locked) { try { localStorage.removeItem('bp:pending'); } catch (_) {} return done(mint, $('name').value || 'Your coin', 0); }
         const signed = await signAll(f.txs);
         const s = await api('/api/launch/send', { mint, creator: pub, txs: signed });
         if (s.ok) { try { localStorage.removeItem('bp:pending'); } catch (_) {} done(mint, $('name').value, 0); } else throw new Error(s.reason || 'Still not locked. Try again.');
