@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The board · Belief Pad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Outfit:wght@200;300;400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FBFBFC;
+    --ink: #0B0B0F;
+    --mute: #6B6B78;
+    --line: #E6E6EB;
+    --wash: #F3F3F6;
+    --up: #0E8A4F;
+    --down: #B4232C;
+    --display: 'Outfit', system-ui, sans-serif;
+    --ui: 'Figtree', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 16px/1.55 var(--ui);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter); }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* nav */
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font: 400 19px var(--display); letter-spacing: .01em; white-space: nowrap; }
+  .brand svg { width: 26px; height: 26px; flex: none; }
+  .nav-right { display: flex; align-items: center; gap: 28px; }
+  .nav-right a.link { text-decoration: none; color: var(--mute); font-size: 15px; transition: color .15s; }
+  .nav-right a.link:hover, .nav-right a.link.on { color: var(--ink); }
+  .nav-right a.link.on { text-decoration: underline; text-underline-offset: 7px; text-decoration-thickness: 1px; }
+  .pill {
+    font: 500 14px var(--ui); color: var(--ink); background: transparent; white-space: nowrap;
+    border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .pill:hover { background: var(--ink); color: var(--bg); }
+
+  .btn-solid {
+    display: inline-block; background: var(--ink); color: var(--bg); text-decoration: none; font: 500 15px var(--ui);
+    padding: 14px 28px; border-radius: 999px; transition: transform .15s, box-shadow .15s;
+  }
+  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(11,11,15,.18); }
+  .btn-text { font: 500 15px var(--ui); text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+  /* shared bits */
+  h2.sec { font: 300 30px/1.2 var(--display); letter-spacing: -.01em; }
+  .meta { color: var(--mute); font-size: 14px; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 44px; color: var(--mute); font-size: 14px; margin-top: clamp(40px, 6vw, 80px); }
+  footer .wrap { display: grid; gap: 14px; }
+  footer .row1 { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer .fbrand { display: grid; gap: 8px; }
+  footer .fb { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 400 18px var(--display); }
+  footer .fb svg { width: 22px; height: 22px; }
+  footer .tag { color: var(--mute); font-size: 14px; }
+  footer .links { display: flex; gap: 22px; }
+  footer .links a { text-decoration: none; }
+  footer .links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+
+
+  /* contract address bar */
+  .cabar { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 8px var(--gutter); background: var(--ink); color: var(--bg); font-size: 13px; }
+  .cabar[hidden] { display: none; }
+  .cabar .ca-k { opacity: .6; }
+  .cabar code { font: 400 12.5px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .cabar button { font: 500 12px var(--ui); color: var(--ink); background: var(--bg); border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer; flex: none; }
+  .cabar a { color: var(--bg); opacity: .75; text-underline-offset: 3px; flex: none; }
+  .cabar a:hover { opacity: 1; }
+  .nav-right a.xl { display: grid; place-items: center; width: 20px; height: 20px; color: var(--mute); transition: color .15s, transform .15s; }
+  .nav-right a.xl svg { width: 17px; height: 17px; }
+  .nav-right a.xl:hover { color: var(--ink); transform: translateY(-1px); }
+  @media (max-width: 560px) { .nav-right a.xl { display: none; }
+    .nav-right { gap: 14px; } .pill { padding: 7px 12px; font-size: 13px; } .cabar { gap: 8px; } .cabar code { font-size: 10.5px; } .cabar a { display: none; } }
+
+  /* subtle motion */
+  .js .rv { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+  .js .rv.in { opacity: 1; transform: none; }
+  .brand svg circle:nth-child(2) { animation: draw 1.1s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes draw { from { stroke-dasharray: 0 70; } to { stroke-dasharray: 52 70; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .first .item { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  .first .item:nth-child(2) { animation-delay: .06s; } .first .item:nth-child(3) { animation-delay: .12s; }
+  .first .item:nth-child(4) { animation-delay: .18s; } .first .item:nth-child(5) { animation-delay: .24s; }
+  .first .item:nth-child(n+6) { animation-delay: .3s; }
+  .pill:active, .btn-solid:active { transform: scale(.97); }
+  .btn-text { transition: opacity .15s; } .btn-text:hover { opacity: .6; }
+  @media (max-width: 430px) { .brand span { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .js .rv { opacity: 1; transform: none; transition: none; }
+    .brand svg circle:nth-child(2), .first .item { animation: none; }
+  }
+
+  @media (max-width: 720px) {
+    .nav-right { gap: 16px; }
+    .pill { padding: 8px 13px; font-size: 13px; }
+    .brand { font-size: 18px; gap: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding: clamp(28px, 5vw, 64px) 0 26px; }
+  h1 { font: 300 clamp(44px, 7vw, 84px)/1 var(--display); letter-spacing: -.03em; }
+  .lede { color: var(--mute); font-size: clamp(16px, 1.5vw, 18px); max-width: 32em; margin-top: 14px; }
+  .clocks { display: flex; gap: 32px; }
+  .clock .k { color: var(--mute); font-size: 14px; }
+  .clock .v { font: 300 28px/1.2 var(--display); font-variant-numeric: tabular-nums; }
+
+  /* tabs */
+  .tabs { display: flex; gap: 26px; border-bottom: 1px solid var(--line); margin-top: 8px; }
+  .tab { background: none; border: 0; font: 500 15px var(--ui); color: var(--mute); padding: 12px 0; cursor: pointer; position: relative; }
+  .tab:hover { color: var(--ink); }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); }
+
+  /* list */
+  .cols, .row { display: grid; grid-template-columns: 40px minmax(0, 1.4fr) 124px 108px 64px 84px 84px 20px; align-items: center; gap: 18px; }
+  .cols { color: var(--mute); font-size: 13px; padding: 14px 12px 8px; }
+  .cols > :nth-child(n+4), .row > :nth-child(n+4):not(.chev) { text-align: right; }
+  .item { border-top: 1px solid var(--line); }
+  .item:last-child { border-bottom: 1px solid var(--line); }
+  .row { width: 100%; background: none; border: 0; text-align: left; color: inherit; font: inherit; padding: 20px 12px; cursor: pointer; transition: background .15s; }
+  .row:hover { background: var(--wash); }
+  .rank { font: 300 20px var(--display); color: var(--mute); }
+  .name { font: 400 21px var(--display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .name small { color: var(--mute); font: 400 14px var(--ui); margin-left: 8px; }
+  .spark svg { display: block; width: 124px; height: 30px; overflow: visible; }
+  .score { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+  .score b { font: 300 30px/1 var(--display); font-variant-numeric: tabular-nums; min-width: 2.1ch; text-align: right; }
+  .score svg { width: 22px; height: 22px; flex: none; }
+  .score b.flash { animation: flash 1.2s ease-out; }
+  @keyframes flash { 0% { color: var(--up); } 100% { color: var(--ink); } }
+  .delta { font: 500 14px var(--ui); font-variant-numeric: tabular-nums; }
+  .num { font: 400 15px var(--ui); font-variant-numeric: tabular-nums; color: var(--mute); }
+  .chev { width: 10px; height: 10px; border-right: 1.5px solid var(--mute); border-bottom: 1.5px solid var(--mute); transform: rotate(45deg); transition: transform .2s; justify-self: end; margin-right: 3px; }
+  .row[aria-expanded="true"] .chev { transform: rotate(225deg); }
+
+  /* detail */
+  .detail { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(24px, 5vw, 64px); padding: 6px 12px 34px 70px; }
+  .detail[hidden] { display: none; }
+  .detail h3 { font: 400 17px var(--display); margin-bottom: 12px; }
+  .steps { display: grid; grid-template-columns: 1fr auto; gap: 0 20px; font-size: 15px; }
+  .steps dt, .steps dd { padding: 8px 0; border-top: 1px solid var(--line); }
+  .steps dt { color: var(--mute); }
+  .steps dd { text-align: right; font-variant-numeric: tabular-nums; margin: 0; }
+  .steps dt:last-of-type, .steps dd:last-of-type { border-top: 1px solid var(--ink); color: var(--ink); font-weight: 500; }
+  .steps small { color: var(--mute); font-size: 13px; }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart .axis { display: flex; justify-content: space-between; color: var(--mute); font-size: 13px; margin-top: 8px; }
+  .facts { margin-top: 18px; color: var(--mute); font-size: 14px; line-height: 1.8; }
+  .facts b { color: var(--ink); font-weight: 500; font-family: var(--mono); font-size: 13px; }
+  .tier { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 12px 3px 8px; font-size: 13px; margin-bottom: 16px; }
+  .tier svg { width: 16px; height: 16px; }
+  .docslink { display: inline-block; margin-top: 14px; font-size: 14px; text-underline-offset: 4px; }
+
+  /* sections below the list */
+  section.blk { padding-top: clamp(56px, 8vw, 96px); }
+  .head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pay { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 4vw, 56px); }
+  .pay > div { border-top: 1px solid var(--ink); padding-top: 16px; }
+  .pay .place { color: var(--mute); font-size: 14px; }
+  .pay .who { font: 400 24px var(--display); margin: 2px 0 10px; }
+  .pay .who small { color: var(--mute); font: 400 14px var(--ui); margin-left: 6px; }
+  .pay .amt { font: 300 36px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+  .pay .amt small { font: 400 14px var(--ui); color: var(--mute); margin-left: 6px; }
+  .pay .split { color: var(--mute); font-size: 14px; margin-top: 8px; }
+  .note { color: var(--mute); max-width: 62ch; margin-top: 24px; font-size: 15px; }
+  .note a { text-underline-offset: 4px; }
+
+  .warm { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(20px, 4vw, 56px); }
+  .warm > div { border-top: 1px solid var(--line); padding-top: 16px; }
+  .warm .who { font: 400 21px var(--display); }
+  .warm .who small { color: var(--mute); font: 400 14px var(--ui); margin-left: 6px; }
+  .prog { margin-top: 14px; font-size: 14px; color: var(--mute); }
+  .prog .bar { height: 2px; background: var(--line); margin: 6px 0 12px; position: relative; }
+  .prog .bar i { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+  .prog .bar i.done { background: var(--up); }
+
+  .legend { display: flex; gap: clamp(20px, 4vw, 48px); flex-wrap: wrap; }
+  .legend > div { display: flex; align-items: center; gap: 12px; }
+  .legend svg { width: 28px; height: 28px; flex: none; }
+  .legend b { font: 400 18px var(--display); display: block; line-height: 1.2; }
+  .legend span { color: var(--mute); font-size: 14px; }
+
+  @media (max-width: 1000px) {
+    .cols, .row { grid-template-columns: 36px minmax(0, 1.4fr) 124px 108px 64px 84px 20px; }
+    .cols > :nth-child(7), .row > :nth-child(7) { display: none; }
+  }
+  @media (max-width: 860px) {
+    .cols, .row { grid-template-columns: 36px minmax(0, 1.4fr) 108px 64px 78px 20px; gap: 14px; }
+    .cols > :nth-child(3), .row > :nth-child(3) { display: none; }
+    .detail { grid-template-columns: 1fr; padding-left: 12px; }
+    .pay, .warm { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .cols { display: none; }
+    .row { grid-template-columns: 26px minmax(0, 1fr) auto 52px 14px; gap: 10px; padding: 18px 4px; }
+    .row > :nth-child(6) { display: none; }
+    .name small { display: none; }
+    .score b { font-size: 26px; }
+    .score svg { display: none; }
+    .clocks { gap: 24px; }
+    .detail { padding: 4px 4px 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .score b.flash { animation: none; } .chev { transition: none; } }
+
+</style>
+</head>
+<body>
+<div class="cabar" id="cabar" hidden>
+  <span class="ca-k">CA</span>
+  <code id="caText"></code>
+  <button type="button" id="caCopy">Copy</button>
+  <a id="caLink" href="#" target="_blank" rel="noopener">pump.fun</a>
+</div>
+<div class="wrap">
+  <nav class="nav" aria-label="Main">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>
+      <span>Belief Pad</span>
+    </a>
+    <div class="nav-right">
+      <a class="link on" href="board.html">Board</a>
+      <a class="link" href="docs.html">Docs</a>
+      <a class="link" href="launch.html">Launch</a>
+      <a class="xl" href="https://x.com/BeliefPad" target="_blank" rel="noopener" aria-label="Belief Pad on X"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <button class="pill" id="wallet" type="button">Connect wallet</button>
+    </div>
+  </nav>
+</div>
+
+
+<main class="wrap">
+  <header class="top">
+    <div>
+      <h1>The board</h1>
+      <p class="lede">Every coin launched on Belief Pad, ranked by Belief out of 1,000. Select a coin to see how its score is built.</p>
+    </div>
+    <div class="clocks">
+      <div class="clock"><div class="k">Next snapshot</div><div class="v" id="snap">03:12</div></div>
+      <div class="clock"><div class="k">Next payout</div><div class="v" id="pay">00:41:07</div></div>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Sort the board">
+    <button class="tab" role="tab" aria-selected="true" data-sort="belief">Belief</button>
+    <button class="tab" role="tab" aria-selected="false" data-sort="rising">Rising</button>
+    <button class="tab" role="tab" aria-selected="false" data-sort="new">Newest</button>
+  </div>
+
+  <div class="cols" aria-hidden="true">
+    <div>#</div><div>Coin</div><div>Last 24 hours</div><div>Belief</div><div>15 min</div><div>Holders</div><div>Avg hold</div><div></div>
+  </div>
+  <div id="list"></div>
+
+  <section class="blk" id="payouts">
+    <div class="head">
+      <h2 class="sec">Paid this hour</h2>
+      <div class="meta">Pool this hour: <span id="pool"></span> $BPAD. The daily pool so far is 1.11M $BPAD.</div>
+    </div>
+    <div class="pay" id="payGrid"></div>
+    <p class="note">The top three coins by average Belief across the hour share the hourly pool. Half of each coin's payout goes to its creator and half to its holders, split by how much each wallet added to the score. The ten best coins of the day share the daily pool. <a href="docs.html#rewards">How rewards work</a></p>
+  </section>
+
+  <section class="blk" id="warming">
+    <div class="head">
+      <h2 class="sec">Warming up</h2>
+      <div class="meta">Coins join the board after one hour and 15 holders.</div>
+    </div>
+    <div class="warm" id="warmGrid"></div>
+  </section>
+
+  <section class="blk" id="rings">
+    <div class="head"><h2 class="sec">Rings</h2><div class="meta">The ring beside each score fills as Belief grows.</div></div>
+    <div class="legend" id="legend"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row1">
+      <div class="fbrand">
+        <a class="fb" href="index.html"><svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>Belief Pad</a>
+        <span class="tag">Nothing ranks higher than belief.</span>
+      </div>
+      <div class="links"><a href="board.html">Board</a><a href="docs.html">Docs</a><a href="docs.html#parameters">Parameters</a><a href="https://x.com/BeliefPad" target="_blank" rel="noopener">X</a></div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  const DATA = {"sybil": {"wallets": 500, "honest": 519, "clustered": 148, "eff": 22.4}, "coins": [{"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}, {"n": "Ironwill", "t": "IRON", "H": 4812, "mu": 6.2, "R": 0.91, "Q": 1.3, "top10": 0.19, "age": 19.5, "mc": "$968K", "d": 42, "b": 849, "w": 1.035, "B": 4982, "reach": 0.849, "spread": 1.0, "spark": [null, null, null, null, 411.9, 476.1, 536.0, 597.7, 618.4, 665.0, 695.8, 710.7, 737.5, 736.7, 750.9, 768.8, 798.0, 796.9, 799.8, 817.2, 817.2, 815.5, 839.8, 849], "creator": "brZN…hFgt", "mint": "sqwD…pump", "b0": 807}, {"n": "Quiet Hands", "t": "HANDS", "H": 3906, "mu": 8.1, "R": 0.96, "Q": 1.3, "top10": 0.21, "age": 40.2, "mc": "$1.08M", "d": -6, "b": 821, "w": 1.119, "B": 4372, "reach": 0.832, "spread": 0.988, "spark": [785.1, 802.2, 803.6, 820.5, 817.1, 801.2, 831.0, 797.5, 810.9, 825.8, 801.9, 816.4, 798.7, 824.9, 829.3, 821.9, 834.6, 811.9, 827.7, 823.8, 823.4, 818.4, 834.3, 821], "creator": "tGuS…ptFD", "mint": "aYPo…pump", "b0": 827}, {"n": "Paper Lantern", "t": "LANTERN", "H": 2874, "mu": 5.5, "R": 0.9, "Q": 1.25, "top10": 0.22, "age": 14.8, "mc": "$612K", "d": 9, "b": 751, "w": 0.97, "B": 2789, "reach": 0.77, "spread": 0.975, "spark": [null, null, null, null, null, null, null, null, null, 389.0, 448.7, 481.2, 537.1, 569.6, 608.5, 628.0, 631.6, 652.0, 676.0, 666.4, 691.9, 690.4, 696.0, 751], "creator": "22sJ…XHDm", "mint": "fPVt…pump", "b0": 742}, {"n": "Slow Burn", "t": "SLOW", "H": 2190, "mu": 9.3, "R": 0.94, "Q": 1.3, "top10": 0.24, "age": 36.7, "mc": "$403K", "d": -12, "b": 714, "w": 1.108, "B": 2426, "reach": 0.751, "spread": 0.95, "spark": [669.2, 693.2, 701.0, 677.7, 682.2, 687.3, 689.9, 701.0, 706.6, 696.7, 688.9, 704.7, 703.9, 711.8, 726.2, 717.5, 711.8, 715.8, 718.3, 696.4, 726.8, 722.8, 726.3, 714], "creator": "gzgv…1XiP", "mint": "ti6v…pump", "b0": 726}, {"n": "Tidepool", "t": "TIDE", "H": 2900, "mu": 4.9, "R": 0.88, "Q": 1.2, "top10": 0.27, "age": 12.1, "mc": "$744K", "d": 27, "b": 694, "w": 0.896, "B": 2598, "reach": 0.761, "spread": 0.912, "spark": [null, null, null, null, null, null, null, null, null, null, null, 322.9, 369.3, 419.7, 463.8, 510.6, 519.7, 554.5, 578.5, 606.5, 620.0, 634.4, 627.0, 694], "creator": "oPQ6…F7FX", "mint": "DNEX…pump", "b0": 667}, {"n": "Kettle", "t": "KETTLE", "H": 1844, "mu": 3.6, "R": 0.87, "Q": 1.2, "top10": 0.23, "age": 8.4, "mc": "$287K", "d": 5, "b": 663, "w": 0.83, "B": 1531, "reach": 0.689, "spread": 0.963, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 320.1, 372.3, 410.3, 459.2, 477.2, 503.6, 529.7, 547.4, 663], "creator": "j8Rs…nqDX", "mint": "yCUs…pump", "b0": 658}, {"n": "Dusk Mail", "t": "DUSK", "H": 1302, "mu": 5.0, "R": 0.9, "Q": 1.25, "top10": 0.26, "age": 17.3, "mc": "$191K", "d": -3, "b": 611, "w": 0.957, "B": 1246, "reach": 0.661, "spread": 0.925, "spark": [null, null, null, null, null, null, 293.0, 334.4, 377.2, 413.9, 443.8, 463.2, 502.0, 524.1, 525.8, 539.2, 539.2, 548.8, 563.3, 567.6, 589.5, 574.9, 574.7, 611], "creator": "B92A…ezWt", "mint": "iAgu…pump", "b0": 614}, {"n": "Oat Milk Capital", "t": "OAT", "H": 2467, "mu": 2.8, "R": 0.84, "Q": 1.15, "top10": 0.38, "age": 6.9, "mc": "$356K", "d": 31, "b": 548, "w": 0.711, "B": 1754, "reach": 0.707, "spread": 0.775, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 282.1, 320.2, 355.8, 382.9, 412.0, 424.9, 548], "creator": "hN6t…oSWS", "mint": "p6oB…pump", "b0": 517}, {"n": "Mooncrumb", "t": "CRUMB", "H": 1017, "mu": 3.2, "R": 0.86, "Q": 1.2, "top10": 0.29, "age": 5.6, "mc": "$144K", "d": 11, "b": 534, "w": 0.794, "B": 807, "reach": 0.602, "spread": 0.888, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 268.6, 303.6, 344.3, 364.0, 398.1, 534], "creator": "fXjP…Acc9", "mint": "21to…pump", "b0": 523}], "warming": [{"n": "Moss & Co", "t": "MOSS", "age_min": 34, "H": 11}, {"n": "Night Shift", "t": "NIGHT", "age_min": 52, "H": 14}, {"n": "Pebble", "t": "PEBBLE", "age_min": 19, "H": 6}], "ttable": [[0.25, "15 min", 0.132], [0.5, "30 min", 0.244], [1, "1 hour", 0.42], [2, "2 hours", 0.638], [3, "3 hours", 0.754], [6, "6 hours", 0.872], [12, "12 hours", 0.925], [24, "24 hours", 1.0]], "const": {"tau": 1.5, "fast": 0.85, "slow": 0.15, "dust": 10, "scale": 10, "bmax": 15000, "free": 0.2, "floor": 0.4}, "example": {"top": {"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}}};
+  // Contract address. Paste the BPAD mint address between the quotes when the coin launches.
+  // Leave it empty and the bar stays hidden.
+  const CA = '';
+  (function () {
+    const bar = document.getElementById('cabar');
+    if (!bar || !CA) return;
+    bar.hidden = false;
+    document.getElementById('caText').textContent = CA;
+    document.getElementById('caLink').href = 'https://pump.fun/coin/' + CA;
+    const btn = document.getElementById('caCopy');
+    btn.addEventListener('click', () => {
+      const done = () => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(CA).then(done, fallback);
+      else fallback();
+      function fallback() {
+        const r = document.createRange(); r.selectNodeContents(document.getElementById('caText'));
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        try { document.execCommand('copy'); done(); } catch (e) {} s.removeAllRanges();
+      }
+    });
+  })();
+
+  // Real wallet connect (Phantom, Solflare, Backpack). Exposes window.BP for the launch page.
+  window.BP = { publicKey: null, provider: null, listeners: [], onChange(f) { this.listeners.push(f); f(this.publicKey); } };
+  (function () {
+    const btn = document.getElementById('wallet');
+    if (!btn) return;
+    const find = () => (window.phantom && window.phantom.solana && window.phantom.solana.isPhantom && window.phantom.solana)
+      || (window.solflare && window.solflare.isSolflare && window.solflare)
+      || (window.backpack && window.backpack.solana) || (window.solana && window.solana.isPhantom && window.solana) || null;
+    const short = (k) => k.slice(0, 4) + '…' + k.slice(-4);
+    const set = (pk, provider) => {
+      BP.publicKey = pk; BP.provider = provider || BP.provider;
+      btn.textContent = pk ? short(pk) : 'Connect wallet';
+      BP.listeners.forEach((f) => f(pk));
+    };
+    async function connect(silent) {
+      const p = find();
+      if (!p) { if (!silent) window.open('https://phantom.app/download', '_blank', 'noopener'); return; }
+      try { const r = await p.connect(silent ? { onlyIfTrusted: true } : undefined); set((r.publicKey || p.publicKey).toString(), p); }
+      catch (e) { /* user closed the prompt */ }
+    }
+    btn.addEventListener('click', async () => {
+      if (BP.publicKey) { try { await BP.provider.disconnect(); } catch (e) {} set(null); } else connect(false);
+    });
+    window.addEventListener('load', () => connect(true));
+  })();
+
+  // gentle reveal on load and scroll
+  document.documentElement.classList.add('js');
+  document.addEventListener('DOMContentLoaded', () => {
+    const list = document.getElementById('list');
+    if (list) { list.classList.add('first'); setTimeout(() => list.classList.remove('first'), 1200); }
+    const groups = [
+      ['.hero h1, .hero .sub, .hero .cta, .hero .ring', 0.09],
+      ['.top > *, .tabs', 0.08],
+      ['.head, .how > div, .close > *, .pay > div, .warm > *, #rings .blk > *, article section > h2', 0.07],
+      ['#rows .row', 0.06],
+      ['article section > :not(h2)', 0],
+    ];
+    const els = [];
+    groups.forEach(([sel, step]) => {
+      document.querySelectorAll(sel).forEach((el, i) => {
+        if (el.classList.contains('rv') || el.closest('.calc, #list')) return;
+        el.classList.add('rv'); el.style.setProperty('--d', (step ? Math.min(i, 6) * step : 0) + 's'); els.push(el);
+      });
+    });
+    if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -6% 0px' });
+    requestAnimationFrame(() => requestAnimationFrame(() => els.forEach(e => io.observe(e))));
+  });
+
+
+  // ---- the Belief model, same constants and formula as the docs page
+  const K = DATA.const;
+  const T = h => K.fast * (1 - Math.exp(-h / K.tau)) + K.slow * Math.min(h / 24, 1);
+  const reach = B => Math.min(1, Math.log10(1 + B / K.scale) / Math.log10(1 + K.bmax / K.scale));
+  const spread = t => Math.max(K.floor, 1 - Math.max(0, t - K.free) / 0.8);
+  function model(c) {
+    const w = T(c.mu) * c.R * c.Q, B = c.H * w, r = reach(B), s = spread(c.top10);
+    return { w, B, r, s, b: 1000 * r * s };
+  }
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coins = DATA.coins.map(c => ({ ...c, m: model(c), prev: null }));
+  coins.forEach(c => { c.val = Math.round(c.m.b); });
+  const list = document.getElementById('list');
+  let sortBy = 'belief', openT = null;
+
+  const fmt = n => Math.round(n).toLocaleString('en-US');
+  const hm = h => { let H = Math.floor(h), M = Math.round((h - H) * 60); if (M === 60) { H++; M = 0; } return H + 'h ' + String(M).padStart(2, '0') + 'm'; };
+  const ageStr = h => h >= 24 ? Math.floor(h / 24) + 'd ' + Math.round(h % 24) + 'h' : hm(h);
+  const sign = d => (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d);
+
+  // ring icon: thin ring with an arc, same mark as the logo
+  function ring(frac, size) {
+    const r = 9, C = 2 * Math.PI * r;
+    return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true"><circle cx="12" cy="12" r="${r}" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="12" cy="12" r="${r}" fill="none" stroke="#0B0B0F" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="${(C * frac).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 12 12)"/></svg>`;
+  }
+  const tierOf = v => v >= 800 ? 'Crown' : v >= 500 ? 'Diamond' : v >= 250 ? 'Lit' : null;
+
+  function sparkPath(vals, w, h, pad) {
+    const pts = vals.map((v, i) => v == null ? null : [i, v]).filter(Boolean);
+    const lo = Math.min(...pts.map(p => p[1])), hi = Math.max(...pts.map(p => p[1]));
+    const span = Math.max(hi - lo, 1);
+    const xy = pts.map(([i, v]) => [(i / 23) * w, pad + (1 - (v - lo) / span) * (h - pad * 2)]);
+    return { xy, lo, hi, d: xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') };
+  }
+  function sparkSVG(c) {
+    const s = sparkPath(c.spark, 124, 30, 3), last = s.xy[s.xy.length - 1];
+    return `<svg viewBox="0 0 124 30" aria-hidden="true"><path d="${s.d}" fill="none" stroke="#0B0B0F" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${last[0]}" cy="${last[1]}" r="2.5" fill="#0B0B0F"/></svg>`;
+  }
+  function bigChart(c) {
+    const s = sparkPath(c.spark, 600, 140, 8), last = s.xy[s.xy.length - 1];
+    const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="600" y1="${(140 * f).toFixed(0)}" y2="${(140 * f).toFixed(0)}" stroke="#E6E6EB" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join('');
+    const area = s.d + ` L${last[0]} 140 L${s.xy[0][0]} 140 Z`;
+    return `<svg viewBox="0 0 600 140" role="img" aria-label="Belief over the last 24 hours, from ${Math.round(s.lo)} to ${Math.round(s.hi)}">${grid}<path d="${area}" fill="#0B0B0F" fill-opacity=".05"/><path d="${s.d}" fill="none" stroke="#0B0B0F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${last[0]}" cy="${last[1]}" r="4" fill="#0B0B0F"/></svg>
+      <div class="axis"><span>${c.age < 24 ? 'Launched' : '24 hours ago'}</span><span>Low ${Math.round(s.lo)} · High ${Math.round(s.hi)}</span><span>Now</span></div>`;
+  }
+
+  function detail(c) {
+    const m = c.m, v = c.val, tier = tierOf(v);
+    return `<div class="detail" id="d-${c.t}" role="region" aria-label="${c.n} score breakdown">
+      <div>
+        ${tier ? `<span class="tier">${ring(tier === 'Crown' ? .8 : tier === 'Diamond' ? .5 : .25, 16)}${tier}</span>` : ''}
+        <h3>How this score is built</h3>
+        <dl class="steps">
+          <dt>Holders counted</dt><dd>${fmt(c.H)}</dd>
+          <dt>Typical hold time</dt><dd>${hm(c.mu)} <small>(time weight ${T(c.mu).toFixed(2)})</small></dd>
+          <dt>Position kept</dt><dd>${Math.round(c.R * 100)}%</dd>
+          <dt>Typical size tier</dt><dd>${c.Q.toFixed(2)}×</dd>
+          <dt>Weight per holder</dt><dd>${m.w.toFixed(2)}</dd>
+          <dt>Belief points</dt><dd>${fmt(m.B)}</dd>
+          <dt>Reach</dt><dd>${m.r.toFixed(3)}</dd>
+          <dt>Spread</dt><dd>${m.s.toFixed(2)} <small>(top 10 hold ${Math.round(c.top10 * 100)}%)</small></dd>
+          <dt>Belief</dt><dd>${v}</dd>
+        </dl>
+        <a class="docslink" href="docs.html#belief">Read how Belief is scored</a>
+      </div>
+      <div class="chart">
+        <h3>Last 24 hours</h3>
+        ${bigChart(c)}
+        <p class="facts">Launched <b>${ageStr(c.age)}</b> ago &middot; Market cap <b>${c.mc}</b><br>Creator <b>${c.creator}</b> &middot; Mint <b>${c.mint}</b></p>
+      </div>
+    </div>`;
+  }
+
+  function render() {
+    const focusT = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.t : null;
+    coins.forEach(c => { c.m = model(c); c.val = Math.round(c.m.b); c.d = c.val - c.b0; c.spark[23] = c.val; });
+    const sorted = [...coins].sort((a, z) =>
+      sortBy === 'belief' ? z.val - a.val : sortBy === 'rising' ? z.d - a.d : a.age - z.age);
+    list.innerHTML = sorted.map((c, i) => `
+      <div class="item">
+        <button class="row" data-t="${c.t}" aria-expanded="${openT === c.t}" aria-controls="d-${c.t}">
+          <span class="rank">${i + 1}</span>
+          <span class="name">${c.n}<small>$${c.t}</small></span>
+          <span class="spark">${sparkSVG(c)}</span>
+          <span class="score">${ring(c.val / 1000, 22)}<b data-v="${c.val}">${c.val}</b></span>
+          <span class="delta tnum ${c.d >= 0 ? 'up' : 'down'}">${sign(c.d)}</span>
+          <span class="num">${fmt(c.H)}</span>
+          <span class="num">${hm(c.mu)}</span>
+          <span class="chev"></span>
+        </button>
+        ${openT === c.t ? detail(c) : ''}
+      </div>`).join('');
+    // flash scores that moved since the last paint
+    if (!reduce) sorted.forEach(c => {
+      if (c.prev != null && c.prev !== c.val) {
+        const el = list.querySelector(`[data-t="${c.t}"] .score b`);
+        if (el) el.classList.add('flash');
+      }
+    });
+    coins.forEach(c => { c.prev = c.val; });
+    if (focusT) { const f = list.querySelector(`[data-t="${focusT}"]`); if (f) f.focus({ preventScroll: true }); }
+    renderPayouts(sorted.slice().sort((a, z) => z.val - a.val));
+  }
+
+  list.addEventListener('click', e => {
+    const b = e.target.closest('.row'); if (!b) return;
+    openT = openT === b.dataset.t ? null : b.dataset.t;
+    render();
+  });
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    sortBy = t.dataset.sort;
+    document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+    render();
+  }));
+
+  // ---- payouts (top 3 by Belief; shares 50 / 30 / 20 of the hourly pool)
+  const POOL = 41200, SHARES = [0.5, 0.3, 0.2], PLACES = ['First', 'Second', 'Third'];
+  function renderPayouts(byBelief) {
+    document.getElementById('pool').textContent = fmt(POOL);
+    document.getElementById('payGrid').innerHTML = byBelief.slice(0, 3).map((c, i) => {
+      const amt = POOL * SHARES[i];
+      return `<div><div class="place">${PLACES[i]} · ${Math.round(SHARES[i] * 100)}% of the pool</div>
+        <div class="who">${c.n}<small>$${c.t}</small></div>
+        <div class="amt">${fmt(amt)}<small>$BPAD</small></div>
+        <div class="split">${fmt(amt / 2)} to the creator, ${fmt(amt / 2)} to holders</div></div>`;
+    }).join('');
+  }
+
+  // ---- warming up
+  document.getElementById('warmGrid').innerHTML = DATA.warming.map(w => {
+    const tPct = Math.min(100, w.age_min / 60 * 100), hPct = Math.min(100, w.H / 15 * 100);
+    return `<div><div class="who">${w.n}<small>$${w.t}</small></div>
+      <div class="prog">
+        <div>${w.age_min} of 60 minutes</div><div class="bar"><i class="${tPct >= 100 ? 'done' : ''}" style="width:${tPct}%"></i></div>
+        <div>${w.H} of 15 holders</div><div class="bar"><i class="${hPct >= 100 ? 'done' : ''}" style="width:${hPct}%"></i></div>
+      </div></div>`;
+  }).join('');
+
+  // ---- ring legend
+  document.getElementById('legend').innerHTML = [['Lit', 250, .25], ['Diamond', 500, .5], ['Crown', 800, .8]]
+    .map(([n, v, f]) => `<div>${ring(f, 28)}<div><b>${n}</b><span>${v}+ Belief</span></div></div>`).join('');
+
+  // ---- clocks and live movement
+  const pad = n => String(n).padStart(2, '0');
+  let snap = 192, pay = 41 * 60 + 7;
+  const rnd = (a, z) => a + Math.random() * (z - a);
+  function nudge(big) {
+    const n = big ? 4 : 1;
+    for (let k = 0; k < n; k++) {
+      const c = coins[Math.floor(Math.random() * coins.length)];
+      if (big) { c.H = Math.max(40, Math.round(c.H * (1 + rnd(-.04, .08)))); c.mu = Math.max(.5, c.mu + rnd(-.3, .5)); c.R = Math.min(.99, Math.max(.6, c.R + rnd(-.015, .015))); }
+      else { c.H += Math.round(rnd(20, 90)); }
+    }
+    render();
+  }
+  render();
+  setInterval(() => {
+    snap--; pay--;
+    if (pay < 0) pay = 3599;
+    if (snap < 0) { snap = 299; if (!reduce) nudge(true); }
+    document.getElementById('snap').textContent = pad(Math.floor(snap / 60)) + ':' + pad(snap % 60);
+    document.getElementById('pay').textContent = '00:' + pad(Math.floor(pay / 60)) + ':' + pad(pay % 60);
+  }, 1000);
+  if (!reduce) setInterval(() => nudge(false), 6000);
+</script>
+</body>
+</html>

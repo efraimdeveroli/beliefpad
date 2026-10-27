@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Docs · Belief Pad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Outfit:wght@200;300;400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FBFBFC;
+    --ink: #0B0B0F;
+    --mute: #6B6B78;
+    --line: #E6E6EB;
+    --wash: #F3F3F6;
+    --up: #0E8A4F;
+    --down: #B4232C;
+    --display: 'Outfit', system-ui, sans-serif;
+    --ui: 'Figtree', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 16px/1.55 var(--ui);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--gutter); }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* nav */
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font: 400 19px var(--display); letter-spacing: .01em; white-space: nowrap; }
+  .brand svg { width: 26px; height: 26px; flex: none; }
+  .nav-right { display: flex; align-items: center; gap: 28px; }
+  .nav-right a.link { text-decoration: none; color: var(--mute); font-size: 15px; transition: color .15s; }
+  .nav-right a.link:hover, .nav-right a.link.on { color: var(--ink); }
+  .nav-right a.link.on { text-decoration: underline; text-underline-offset: 7px; text-decoration-thickness: 1px; }
+  .pill {
+    font: 500 14px var(--ui); color: var(--ink); background: transparent; white-space: nowrap;
+    border: 1px solid var(--ink); border-radius: 999px; padding: 9px 18px; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .pill:hover { background: var(--ink); color: var(--bg); }
+
+  .btn-solid {
+    display: inline-block; background: var(--ink); color: var(--bg); text-decoration: none; font: 500 15px var(--ui);
+    padding: 14px 28px; border-radius: 999px; transition: transform .15s, box-shadow .15s;
+  }
+  .btn-solid:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(11,11,15,.18); }
+  .btn-text { font: 500 15px var(--ui); text-underline-offset: 5px; text-decoration-thickness: 1px; }
+
+  /* shared bits */
+  h2.sec { font: 300 30px/1.2 var(--display); letter-spacing: -.01em; }
+  .meta { color: var(--mute); font-size: 14px; }
+  .up { color: var(--up); } .down { color: var(--down); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  footer { border-top: 1px solid var(--line); padding: 30px 0 44px; color: var(--mute); font-size: 14px; margin-top: clamp(40px, 6vw, 80px); }
+  footer .wrap { display: grid; gap: 14px; }
+  footer .row1 { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer .fbrand { display: grid; gap: 8px; }
+  footer .fb { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font: 400 18px var(--display); }
+  footer .fb svg { width: 22px; height: 22px; }
+  footer .tag { color: var(--mute); font-size: 14px; }
+  footer .links { display: flex; gap: 22px; }
+  footer .links a { text-decoration: none; }
+  footer .links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+
+
+  /* contract address bar */
+  .cabar { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 8px var(--gutter); background: var(--ink); color: var(--bg); font-size: 13px; }
+  .cabar[hidden] { display: none; }
+  .cabar .ca-k { opacity: .6; }
+  .cabar code { font: 400 12.5px var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .cabar button { font: 500 12px var(--ui); color: var(--ink); background: var(--bg); border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer; flex: none; }
+  .cabar a { color: var(--bg); opacity: .75; text-underline-offset: 3px; flex: none; }
+  .cabar a:hover { opacity: 1; }
+  .nav-right a.xl { display: grid; place-items: center; width: 20px; height: 20px; color: var(--mute); transition: color .15s, transform .15s; }
+  .nav-right a.xl svg { width: 17px; height: 17px; }
+  .nav-right a.xl:hover { color: var(--ink); transform: translateY(-1px); }
+  @media (max-width: 560px) { .nav-right a.xl { display: none; }
+    .nav-right { gap: 14px; } .pill { padding: 7px 12px; font-size: 13px; } .cabar { gap: 8px; } .cabar code { font-size: 10.5px; } .cabar a { display: none; } }
+
+  /* subtle motion */
+  .js .rv { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+  .js .rv.in { opacity: 1; transform: none; }
+  .brand svg circle:nth-child(2) { animation: draw 1.1s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes draw { from { stroke-dasharray: 0 70; } to { stroke-dasharray: 52 70; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .first .item { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+  .first .item:nth-child(2) { animation-delay: .06s; } .first .item:nth-child(3) { animation-delay: .12s; }
+  .first .item:nth-child(4) { animation-delay: .18s; } .first .item:nth-child(5) { animation-delay: .24s; }
+  .first .item:nth-child(n+6) { animation-delay: .3s; }
+  .pill:active, .btn-solid:active { transform: scale(.97); }
+  .btn-text { transition: opacity .15s; } .btn-text:hover { opacity: .6; }
+  @media (max-width: 430px) { .brand span { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .js .rv { opacity: 1; transform: none; transition: none; }
+    .brand svg circle:nth-child(2), .first .item { animation: none; }
+  }
+
+  @media (max-width: 720px) {
+    .nav-right { gap: 16px; }
+    .pill { padding: 8px 13px; font-size: 13px; }
+    .brand { font-size: 18px; gap: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  .top { padding: clamp(28px, 5vw, 64px) 0 10px; }
+  h1 { font: 300 clamp(44px, 7vw, 84px)/1 var(--display); letter-spacing: -.03em; }
+  .lede { color: var(--mute); font-size: clamp(16px, 1.5vw, 19px); max-width: 34em; margin-top: 14px; }
+  .draft { display: inline-block; margin-top: 22px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 16px; font-size: 14px; color: var(--mute); }
+  .draft b { color: var(--ink); font-weight: 500; }
+
+  .layout { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: clamp(32px, 6vw, 96px); align-items: start; padding-top: clamp(24px, 4vw, 48px); }
+  .toc { position: sticky; top: 24px; font-size: 14px; display: grid; }
+  .toc .k { color: var(--mute); margin-bottom: 8px; font-size: 13px; }
+  .toc a { color: var(--mute); text-decoration: none; padding: 6px 0 6px 14px; border-left: 1px solid var(--line); transition: color .15s; }
+  .toc a:hover { color: var(--ink); }
+  .toc a.on { color: var(--ink); border-left: 2px solid var(--ink); padding-left: 13px; }
+
+  article { max-width: 720px; min-width: 0; }
+  article section { padding-top: clamp(40px, 6vw, 72px); scroll-margin-top: 12px; }
+  article section:first-child { padding-top: 0; }
+  article h2 { font: 300 clamp(30px, 4vw, 42px)/1.12 var(--display); letter-spacing: -.02em; margin-bottom: 18px; }
+  article h3 { font: 400 21px/1.3 var(--display); margin: 36px 0 10px; }
+  article p { font-size: 17px; line-height: 1.7; margin: 0 0 16px; max-width: 66ch; }
+  article p.m { color: var(--mute); font-size: 15px; }
+  article a { text-underline-offset: 4px; }
+  article code { font: 400 .88em var(--mono); background: var(--wash); padding: 1px 6px; border-radius: 4px; }
+
+  .formula { font: 400 14.5px/1.85 var(--mono); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 16px 0; margin: 18px 0; white-space: pre-wrap; word-break: break-word; }
+  .formula b { font-weight: 500; }
+
+  ul.plain { list-style: none; padding: 0; margin: 0 0 16px; }
+  ul.plain li { padding: 14px 0; border-top: 1px solid var(--line); font-size: 17px; line-height: 1.65; }
+  ul.plain li:last-child { border-bottom: 1px solid var(--line); }
+  ul.plain li b { font-weight: 500; }
+
+  ol.steps { list-style: none; padding: 0; margin: 0 0 16px; counter-reset: s; }
+  ol.steps li { counter-increment: s; display: grid; grid-template-columns: 44px 1fr; padding: 18px 0; border-top: 1px solid var(--line); font-size: 17px; line-height: 1.65; }
+  ol.steps li:last-child { border-bottom: 1px solid var(--line); }
+  ol.steps li::before { content: counter(s); font: 300 26px/1.2 var(--display); color: var(--mute); }
+  ol.steps li b { font-weight: 500; display: block; }
+  ol.steps li span { color: #3b3b46; max-width: 60ch; display: block; }
+
+  table.t { width: 100%; border-collapse: collapse; font-size: 15px; margin: 18px 0 22px; }
+  table.t th, table.t td { text-align: left; padding: 10px 14px 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
+  table.t th { color: var(--mute); font-weight: 500; font-size: 13px; border-top: 0; border-bottom: 1px solid var(--ink); }
+  table.t .n { text-align: right; font-variant-numeric: tabular-nums; padding-right: 0; }
+  table.t td.k { color: var(--mute); }
+  table.t tr.sum td { border-top: 1px solid var(--ink); font-weight: 500; }
+  .tw { overflow-x: auto; }
+  .tw table.params { min-width: 560px; }
+
+  /* worked example */
+  table.ex td:first-child { width: 42%; color: var(--mute); }
+  table.ex td:last-child { font-variant-numeric: tabular-nums; }
+
+  /* calculator */
+  .calc { display: grid; grid-template-columns: 1fr 230px; gap: clamp(24px, 4vw, 48px); border-top: 1px solid var(--ink); padding-top: 22px; margin: 22px 0; }
+  .ctl { display: grid; gap: 18px; }
+  .ctl label { display: block; font-size: 15px; }
+  .ctl .lr { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .ctl .lr output { font-variant-numeric: tabular-nums; font-weight: 500; }
+  .ctl input[type=range] { width: 100%; accent-color: var(--ink); }
+  .ctl select { font: 400 15px var(--ui); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink); width: 100%; }
+  .res { text-align: center; align-self: start; }
+  .res .rg { position: relative; width: 190px; height: 190px; margin: 0 auto; }
+  .res .rg svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+  .res .rg .tr { fill: none; stroke: var(--line); stroke-width: 1.5; }
+  .res .rg .ar { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; transition: stroke-dashoffset .35s ease; }
+  .res .rg div { position: absolute; inset: 0; display: grid; place-items: center; font: 200 60px/1 var(--display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .res .where { margin-top: 12px; font-size: 14px; color: var(--mute); line-height: 1.5; }
+  .res .parts { margin-top: 12px; font-size: 13px; color: var(--mute); line-height: 1.7; font-variant-numeric: tabular-nums; }
+
+  /* fee flow */
+  .flow { margin: 22px 0 8px; }
+  .flow .lab { font-size: 14px; color: var(--mute); margin: 0 0 6px; }
+  .bars { display: flex; gap: 3px; height: 40px; margin-bottom: 22px; }
+  .bars i { display: block; height: 100%; }
+  .s1 { background: #0B0B0F; } .s2 { background: rgba(11,11,15,.62); } .s3 { background: rgba(11,11,15,.34); } .s4 { background: rgba(11,11,15,.14); }
+  .sw { display: inline-block; width: 12px; height: 12px; margin-right: 10px; vertical-align: -1px; }
+
+  details.gl { border-top: 1px solid var(--line); }
+  dl.defs { margin: 0; }
+  dl.defs dt { font: 400 19px var(--display); padding-top: 18px; border-top: 1px solid var(--line); }
+  dl.defs dd { margin: 4px 0 0; padding-bottom: 16px; color: #3b3b46; font-size: 16px; line-height: 1.65; max-width: 60ch; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc { position: static; display: flex; flex-wrap: wrap; gap: 4px 18px; margin-bottom: 36px; border-top: 1px solid var(--line); padding-top: 14px; }
+    .toc .k { width: 100%; margin: 0 0 2px; }
+    .toc a { border-left: 0; padding: 4px 0; }
+    .toc a.on { border-left: 0; padding-left: 0; text-decoration: underline; text-underline-offset: 5px; }
+  }
+  @media (max-width: 640px) {
+    .calc { grid-template-columns: 1fr; }
+    .formula { font-size: 13px; }
+    table.ex td:first-child { width: 36%; }
+    table.ex td { padding-right: 10px; }
+    article p, ul.plain li, ol.steps li { font-size: 16px; }
+    ol.steps li { grid-template-columns: 36px 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { .res .rg .ar { transition: none; } }
+
+</style>
+</head>
+<body>
+<div class="cabar" id="cabar" hidden>
+  <span class="ca-k">CA</span>
+  <code id="caText"></code>
+  <button type="button" id="caCopy">Copy</button>
+  <a id="caLink" href="#" target="_blank" rel="noopener">pump.fun</a>
+</div>
+<div class="wrap">
+  <nav class="nav" aria-label="Main">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>
+      <span>Belief Pad</span>
+    </a>
+    <div class="nav-right">
+      <a class="link" href="board.html">Board</a>
+      <a class="link on" href="docs.html">Docs</a>
+      <a class="link" href="launch.html">Launch</a>
+      <a class="xl" href="https://x.com/BeliefPad" target="_blank" rel="noopener" aria-label="Belief Pad on X"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+      <button class="pill" id="wallet" type="button">Connect wallet</button>
+    </div>
+  </nav>
+</div>
+
+
+<main class="wrap">
+  <header class="top">
+    <h1>Docs</h1>
+    <p class="lede">How Belief Pad works, from launching a coin to getting paid. The Belief formula is written out in full.</p>
+  </header>
+
+  <div class="layout">
+    <nav class="toc" aria-label="On this page">
+      <div class="k">On this page</div>
+      <a href="#overview">Overview</a>
+      <a href="#launch">Launching a coin</a>
+      <a href="#belief">The Belief score</a>
+      <a href="#rankings">Rankings</a>
+      <a href="#fair-play">Fair play</a>
+      <a href="#rewards">Rewards</a>
+      <a href="#fees">Fees and treasury</a>
+      <a href="#token">$BPAD</a>
+      <a href="#parameters">Parameters</a>
+    </nav>
+
+    <article>
+
+      <section id="overview">
+        <h2>Overview</h2>
+        <p>Belief Pad is a launchpad on Solana. You launch a coin on pump.fun through Belief Pad, and the coin appears on a public board ranked by Belief: a score out of 1,000 that measures how many people hold the coin and how long they have held it.</p>
+        <p>Most boards rank coins by price or volume, which a few traders can move in minutes. Belief ranks on something slower and more expensive to fake: people choosing to stay.</p>
+        <ul class="plain">
+          <li><b>Launch.</b> Create a coin with a locked fee split. Creators keep most of the fees.</li>
+          <li><b>Belief.</b> A score that updates every five minutes. Holders who stay longer and keep their position count for more. Fake and oversized wallets count for less.</li>
+          <li><b>Rewards.</b> The most believed coins are paid every hour and every day, in $BPAD. Half of each payout goes to that coin's holders.</li>
+        </ul>
+      </section>
+
+      <section id="launch">
+        <h2>Launching a coin</h2>
+        <ol class="steps">
+          <li><div><b>Connect a wallet.</b><span>This wallet becomes the creator wallet. It is left out of every Belief count for the coin.</span></div></li>
+          <li><div><b>Stake to launch.</b><span>Stake at least 0.1% of the $BPAD supply (1,000,000 $BPAD). This keeps spam launches off the board.</span></div></li>
+          <li><div><b>Describe the coin.</b><span>Name, ticker, image and a short description. We pin the image and metadata ourselves so they don't depend on a public gateway.</span></div></li>
+          <li><div><b>Lock the fee split.</b><span>The standard split is 70% to you and 30% to the Belief Pad treasury. Creators who stake 1% of supply or more launch with 80/20. The split is set once, at launch, and nobody can change it afterward, including us.</span></div></li>
+          <li><div><b>Launch on pump.fun.</b><span>Creating the coin and locking the split happen in one flow, so a coin is never left unlocked. An optional first buy is a second approval in your wallet.</span></div></li>
+          <li><div><b>We check the lock.</b><span>Before listing, Belief Pad reads the coin's fee-sharing setup on-chain. If the split isn't the one you chose, or can still be changed, the coin is not listed. If a coin was created but not locked, you can retry the setup.</span></div></li>
+          <li><div><b>Warm up.</b><span>New coins sit under "Warming up" until they are an hour old and have 15 qualifying holders. Then they join the board.</span></div></li>
+        </ol>
+        <p class="m">Creator fees collect in a per-coin vault until they are distributed. Belief Pad runs the distribution on a schedule, and anyone can trigger it.</p>
+      </section>
+
+      <section id="belief">
+        <h2>The Belief score</h2>
+        <p>Belief is a number from 0 to 1,000. It is built in two steps: weigh every wallet, then combine the wallets into one score for the coin.</p>
+
+        <h3>Step 1: weigh each wallet</h3>
+        <p>A wallet's weight is three things multiplied together.</p>
+        <div class="formula"><b>wallet weight</b> = time × kept × size</div>
+
+        <p><b>Time</b> is how long the wallet has held. It rises quickly in the first hours and reaches full weight at 24 hours.</p>
+        <div class="formula"><b>time</b> = 0.85 × (1 − e^(−hours ÷ 1.5)) + 0.15 × min(hours ÷ 24, 1)</div>
+        <div class="tw"><table class="t" aria-label="Time weight by hold duration">
+          <thead><tr><th>Held for</th><th class="n">Time weight</th></tr></thead>
+          <tbody><tr><td>15 min</td><td class='n'>0.13</td></tr><tr><td>30 min</td><td class='n'>0.24</td></tr><tr><td>1 hour</td><td class='n'>0.42</td></tr><tr><td>2 hours</td><td class='n'>0.64</td></tr><tr><td>3 hours</td><td class='n'>0.75</td></tr><tr><td>6 hours</td><td class='n'>0.87</td></tr><tr><td>12 hours</td><td class='n'>0.93</td></tr><tr><td>24 hours</td><td class='n'>1.00</td></tr></tbody>
+        </table></div>
+        <p class="m">The first part of the formula does most of the work, so a new holder sees their effect within the hour. The second part is a slow ramp that rewards the holders who make it to a full day.</p>
+
+        <p><b>Kept</b> is the wallet's current balance divided by the largest balance it has reached in this holding streak. A wallet that never sold is at 100%. Sell half and it is at 50%. Sell everything and the streak ends: if the wallet buys again, its clock starts from zero.</p>
+
+        <p><b>Size</b> depends on the USD value of the position. Tiers stop at 1.75×, so a very large wallet counts for less than two small ones.</p>
+        <div class="tw"><table class="t" aria-label="Size tiers">
+          <thead><tr><th>Position value</th><th class="n">Size</th></tr></thead>
+          <tbody>
+            <tr><td>Under $10</td><td class="n">Not counted</td></tr>
+            <tr><td>$10 to $50</td><td class="n">1.00</td></tr>
+            <tr><td>$50 to $250</td><td class="n">1.25</td></tr>
+            <tr><td>$250 to $1,000</td><td class="n">1.50</td></tr>
+            <tr><td>$1,000 and up</td><td class="n">1.75</td></tr>
+          </tbody>
+        </table></div>
+        <p>For example, a wallet holding $120 for 3 hours that has not sold has a weight of 0.754 × 1 × 1.25 = 0.94. If it sells half, the weight is 0.754 × 0.5 × 1.25 = 0.47.</p>
+
+        <h3>Step 2: combine the wallets</h3>
+        <div class="formula"><b>belief points (B)</b> = sum of every wallet's weight
+
+<b>reach</b>  = log10(1 + B ÷ 10) ÷ log10(1 + 1,500)           capped at 1
+<b>spread</b> = 1 − (top-10 share − 20%) ÷ 80%                 kept between 0.40 and 1
+
+<b>Belief</b> = 1,000 × reach × spread</div>
+        <p><b>Reach</b> turns belief points into a number between 0 and 1 on a log scale. Going from 100 holders to 1,000 matters roughly as much as going from 1,000 to 10,000, so small coins can climb and large coins can't run away. A coin reaches the cap at 15,000 belief points.</p>
+        <p><b>Spread</b> penalizes concentration. If the ten largest wallets hold 20% of the supply or less, there is no penalty. At 60% the spread is 0.50. It never drops below 0.40, so a new coin with concentrated early holders is held back, not wiped out.</p>
+
+        <h3>Worked example</h3>
+        <p>This is how Glasshouse ($GLASS) gets its score on the board right now.</p>
+        <div class="tw"><table class="t ex" aria-label="Worked example">
+          <tbody>
+            <tr><td>Holders counted</td><td>6,420</td></tr>
+            <tr><td>Typical hold time</td><td>7h 42m, so time weight 0.893</td></tr>
+            <tr><td>Position kept</td><td>93%</td></tr>
+            <tr><td>Typical size tier</td><td>1.25</td></tr>
+            <tr><td>Weight per holder</td><td>0.893 × 93% × 1.25 = 1.038</td></tr>
+            <tr><td>Belief points</td><td>6,420 × 1.0382 ≈ 6,666</td></tr>
+            <tr><td>Reach</td><td>2.824 ÷ 3.176 = 0.889</td></tr>
+            <tr><td>Spread</td><td>Top 10 hold 17%, under 20%, so 1.00</td></tr>
+            <tr class="sum"><td>Belief</td><td>1,000 × 0.889 × 1.00 = 889</td></tr>
+          </tbody>
+        </table></div>
+        <p class="m">The board and the calculator below use a typical holder (average hold time, average position kept, average size tier) so the numbers stay readable. The live score weighs every wallet on its own.</p>
+
+        <h3>Try it</h3>
+        <div class="calc" id="calc">
+          <div class="ctl">
+            <label><div class="lr"><span>Holders</span><output id="oH"></output></div><input type="range" id="iH" min="0" max="100" step="any" aria-label="Holders"></label>
+            <label><div class="lr"><span>Typical hold time</span><output id="oMu"></output></div><input type="range" id="iMu" min="0.25" max="24" step="0.25" value="6" aria-label="Typical hold time in hours"></label>
+            <label><div class="lr"><span>Position kept</span><output id="oR"></output></div><input type="range" id="iR" min="40" max="100" step="1" value="90" aria-label="Typical position kept"></label>
+            <label><div class="lr"><span>Typical size tier</span></div>
+              <select id="iQ" aria-label="Typical size tier">
+                <option value="1">1.00 (mostly $10 to $50)</option>
+                <option value="1.25" selected>1.25 (mostly $50 to $250)</option>
+                <option value="1.5">1.50 (mostly $250 to $1,000)</option>
+                <option value="1.75">1.75 ($1,000 and up)</option>
+              </select></label>
+            <label><div class="lr"><span>Top 10 wallets hold</span><output id="oT"></output></div><input type="range" id="iT" min="5" max="90" step="1" value="20" aria-label="Share of supply held by the top 10 wallets"></label>
+          </div>
+          <div class="res" aria-live="polite">
+            <div class="rg"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="tr" cx="100" cy="100" r="95"/><circle class="ar" id="cArc" cx="100" cy="100" r="95"/></svg><div id="cNum">0</div></div>
+            <div class="where" id="cWhere"></div>
+            <div class="parts" id="cParts"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="rankings">
+        <h2>Rankings</h2>
+        <ul class="plain">
+          <li><b>Snapshots.</b> Belief is calculated every 5 minutes. The score on the board is the average of the last three snapshots (15 minutes), so the board moves without flickering.</li>
+          <li><b>Who ranks.</b> A coin ranks once it is at least one hour old and has 15 qualifying holders. Until then it shows under "Warming up" with its progress.</li>
+          <li><b>Sorting.</b> The board sorts by Belief by default. "Rising" sorts by the biggest 15-minute change and "Newest" by launch time.</li>
+          <li><b>Ties.</b> Equal scores are ordered by more belief points, then by longer typical hold time.</li>
+          <li><b>Rings.</b> Each score has a ring that fills as it grows. A coin earns Lit at 250, Diamond at 500 and Crown at 800.</li>
+          <li><b>Nothing hidden.</b> Select any coin to see the numbers behind its score: holders, hold time, position kept, size tier and spread.</li>
+          <li><b>Left out of every count.</b> The creator wallet, the bonding curve and liquidity pool, known exchange wallets, and any wallet funded by the creator.</li>
+        </ul>
+      </section>
+
+      <section id="fair-play">
+        <h2>Fair play</h2>
+        <p>Any ranking that pays out money will be attacked. These rules make faking Belief expensive.</p>
+        <ul class="plain">
+          <li><b>Dust filter.</b> Wallets holding under $10 do not count.</li>
+          <li><b>Wallet clusters.</b> Wallets funded from the same source are treated as a cluster, and a cluster of n wallets counts as √n wallets. For example, 500 separate holders who kept everything for six hours would give a coin a Belief of 519. The same 500 wallets from one funder count as 22.4 wallets and give 148. (Both assume the smallest size tier and no spread penalty.)</li>
+          <li><b>Transfers don't carry time.</b> Tokens received by transfer start the receiving wallet's clock at zero.</li>
+          <li><b>Payouts use the hour's average.</b> Hourly payouts rank coins by their average Belief across the hour, not by one moment, so a last-minute spike earns nothing.</li>
+          <li><b>Reward wait.</b> A wallet must have held for 30 minutes before it shares in a coin's holder reward.</li>
+          <li><b>Verified fee lock.</b> Only coins whose fee split is verified on-chain are listed.</li>
+        </ul>
+        <p class="m">No score is impossible to game. Belief makes it costly, and the rules above are expected to change as we see how people try.</p>
+      </section>
+
+      <section id="rewards">
+        <h2>Rewards</h2>
+        <p>Rewards are paid in $BPAD. Pools fill from the treasury's share of fees (see below): 25% of the rewards bucket goes to the hourly pool and 75% to the daily pool.</p>
+        <div class="tw"><table class="t" aria-label="Reward shares by place">
+          <thead><tr><th>Place</th><th class="n">Hourly pool</th><th class="n">Daily pool</th></tr></thead>
+          <tbody>
+            <tr><td>1st</td><td class="n">50%</td><td class="n">30%</td></tr>
+            <tr><td>2nd</td><td class="n">30%</td><td class="n">20%</td></tr>
+            <tr><td>3rd</td><td class="n">20%</td><td class="n">15%</td></tr>
+            <tr><td>4th</td><td class="n">&mdash;</td><td class="n">10%</td></tr>
+            <tr><td>5th</td><td class="n">&mdash;</td><td class="n">8%</td></tr>
+            <tr><td>6th</td><td class="n">&mdash;</td><td class="n">6%</td></tr>
+            <tr><td>7th</td><td class="n">&mdash;</td><td class="n">4%</td></tr>
+            <tr><td>8th</td><td class="n">&mdash;</td><td class="n">3%</td></tr>
+            <tr><td>9th</td><td class="n">&mdash;</td><td class="n">2%</td></tr>
+            <tr><td>10th</td><td class="n">&mdash;</td><td class="n">2%</td></tr>
+          </tbody>
+        </table></div>
+        <ul class="plain">
+          <li><b>Creator and holders.</b> Each coin's payout is split 50% to its creator and 50% to its eligible holders, in proportion to each wallet's weight. Holders are paid for holding, which also keeps the score honest.</li>
+          <li><b>Claiming.</b> Rewards build up and are claimed in one transaction, so small payouts aren't lost to network fees.</li>
+          <li><b>Variable.</b> Pool sizes depend on trading fees and change every hour. Rewards are not guaranteed.</li>
+        </ul>
+      </section>
+
+      <section id="fees">
+        <h2>Fees and treasury</h2>
+        <p>Every trade of a coin launched here earns creator fees on pump.fun. The fee split locked at launch sends them two ways, and the treasury's share is divided again.</p>
+        <div class="flow">
+          <div class="lab">Every fee</div>
+          <div class="bars" role="img" aria-label="70% to the creator, 30% to the treasury"><i class="s1" style="flex:70"></i><i class="s4" style="flex:30"></i></div>
+          <div class="lab">The treasury's 30%</div>
+          <div class="bars" role="img" aria-label="40% buy and burn, 30% rewards, 20% stakers, 10% operations"><i class="s1" style="flex:40"></i><i class="s2" style="flex:30"></i><i class="s3" style="flex:20"></i><i class="s4" style="flex:10"></i></div>
+        </div>
+        <div class="tw"><table class="t" aria-label="Where fees go">
+          <thead><tr><th>Goes to</th><th class="n">Of the treasury</th><th class="n">Of all fees</th></tr></thead>
+          <tbody>
+            <tr><td>Creator</td><td class="n">&mdash;</td><td class="n">70%</td></tr>
+            <tr><td><span class="sw s1"></span>Buy and burn $BPAD</td><td class="n">40%</td><td class="n">12%</td></tr>
+            <tr><td><span class="sw s2"></span>Belief rewards</td><td class="n">30%</td><td class="n">9%</td></tr>
+            <tr><td><span class="sw s3"></span>Staker rewards</td><td class="n">20%</td><td class="n">6%</td></tr>
+            <tr><td><span class="sw s4"></span>Operations</td><td class="n">10%</td><td class="n">3%</td></tr>
+          </tbody>
+        </table></div>
+        <p class="m">Creators who stake 1% of supply launch with an 80/20 split. The treasury's 20% is divided the same way: 8%, 6%, 4% and 2% of all fees.</p>
+        <h3>Burns</h3>
+        <p>Buybacks run every 10 minutes in small, randomized amounts, so the timing can't be predicted. Once an hour there is a Burn Hour with an extra burn. A live ticker on the site shows how much has been burned in the last hour.</p>
+      </section>
+
+      <section id="token">
+        <h2>$BPAD</h2>
+        <p>Supply is 1,000,000,000, fair-launched on pump.fun with no presale. If any team allocation is bought at launch, it is capped at 5% and disclosed before launch.</p>
+        <div class="tw"><table class="t" aria-label="Allocation">
+          <thead><tr><th>Allocation</th><th class="n">Share of supply</th></tr></thead>
+          <tbody>
+            <tr><td>Belief rewards reserve</td><td class="n">2%</td></tr>
+            <tr><td>Operations (vested, public lock)</td><td class="n">2%</td></tr>
+            <tr><td>Marketing</td><td class="n">1%</td></tr>
+            <tr class="sum"><td>Total, at most</td><td class="n">5%</td></tr>
+          </tbody>
+        </table></div>
+        <h3>What $BPAD is used for</h3>
+        <ul class="plain">
+          <li><b>Stake to launch.</b> 0.1% of supply to list a coin.</li>
+          <li><b>Lower fee share.</b> Creators who stake 1% launch with an 80/20 split instead of 70/30.</li>
+          <li><b>Spotlight.</b> Burn $BPAD to pin a coin to the top of the home page for 24 hours.</li>
+          <li><b>Staker rewards.</b> 6% of all fees, paid daily to stakers, plus an early look at rising coins.</li>
+          <li><b>Rewards currency.</b> Hourly and daily payouts are in $BPAD, so every payout is also a purchase.</li>
+        </ul>
+        <p>The loop: more launches bring more fees, more fees fund more burns and rewards, and a stronger $BPAD gives creators more reason to launch here.</p>
+      </section>
+
+      <section id="parameters">
+        <h2>Parameters</h2>
+        <p>Every number that can be tuned, in one place.</p>
+        <div class="tw"><table class="t params" aria-label="Parameters">
+          <thead><tr><th>Parameter</th><th>Value</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>Time constant</td><td>1.5 hours</td><td>How fast a new holder reaches most of their weight</td></tr>
+            <tr><td>Fast and slow weights</td><td>85% and 15%</td><td>The fast curve and the 24-hour ramp in the time formula</td></tr>
+            <tr><td>Full time weight</td><td>24 hours</td><td>When the slow ramp ends</td></tr>
+            <tr><td>Dust filter</td><td>$10</td><td>Smallest position that counts</td></tr>
+            <tr><td>Size tiers</td><td>1.00 to 1.75</td><td>Caps how much a large wallet can add</td></tr>
+            <tr><td>Reach scale and cap</td><td>10 and 15,000</td><td>Shape of the log curve and where it tops out</td></tr>
+            <tr><td>Concentration threshold</td><td>20%</td><td>Top-10 share with no penalty</td></tr>
+            <tr><td>Spread floor</td><td>0.40</td><td>Most a concentration penalty can remove</td></tr>
+            <tr><td>Cluster weight</td><td>√n</td><td>How a group of linked wallets counts</td></tr>
+            <tr><td>Ranking gate</td><td>1 hour, 15 holders</td><td>When a coin joins the board</td></tr>
+            <tr><td>Snapshot and smoothing</td><td>5 minutes, 3 snapshots</td><td>How often Belief updates and how it is averaged</td></tr>
+            <tr><td>Reward wait</td><td>30 minutes</td><td>Minimum hold to share in holder rewards</td></tr>
+            <tr><td>Launch stake</td><td>0.1% of supply</td><td>What a creator stakes to launch</td></tr>
+            <tr><td>Fee split</td><td>70/30 (80/20 at 1% staked)</td><td>Creator and treasury shares, locked at launch</td></tr>
+            <tr><td>Treasury split</td><td>40 / 30 / 20 / 10</td><td>Burn, rewards, stakers, operations</td></tr>
+            <tr><td>Rewards bucket split</td><td>25% hourly, 75% daily</td><td>How rewards are divided between the two pools</td></tr>
+            <tr><td>Burn interval</td><td>10 minutes</td><td>How often buybacks run, plus an hourly Burn Hour</td></tr>
+            <tr><td>Coin payout split</td><td>50% creator, 50% holders</td><td>How each winning coin's reward is shared</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row1">
+      <div class="fbrand">
+        <a class="fb" href="index.html"><svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#E6E6EB" stroke-width="1.5"/><circle cx="13" cy="13" r="11" fill="none" stroke="#0B0B0F" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="52 70" transform="rotate(-90 13 13)"/></svg>Belief Pad</a>
+        <span class="tag">Nothing ranks higher than belief.</span>
+      </div>
+      <div class="links"><a href="board.html">Board</a><a href="docs.html">Docs</a><a href="docs.html#parameters">Parameters</a><a href="https://x.com/BeliefPad" target="_blank" rel="noopener">X</a></div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  const DATA = {"sybil": {"wallets": 500, "honest": 519, "clustered": 148, "eff": 22.4}, "coins": [{"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}, {"n": "Ironwill", "t": "IRON", "H": 4812, "mu": 6.2, "R": 0.91, "Q": 1.3, "top10": 0.19, "age": 19.5, "mc": "$968K", "d": 42, "b": 849, "w": 1.035, "B": 4982, "reach": 0.849, "spread": 1.0, "spark": [null, null, null, null, 411.9, 476.1, 536.0, 597.7, 618.4, 665.0, 695.8, 710.7, 737.5, 736.7, 750.9, 768.8, 798.0, 796.9, 799.8, 817.2, 817.2, 815.5, 839.8, 849], "creator": "brZN…hFgt", "mint": "sqwD…pump", "b0": 807}, {"n": "Quiet Hands", "t": "HANDS", "H": 3906, "mu": 8.1, "R": 0.96, "Q": 1.3, "top10": 0.21, "age": 40.2, "mc": "$1.08M", "d": -6, "b": 821, "w": 1.119, "B": 4372, "reach": 0.832, "spread": 0.988, "spark": [785.1, 802.2, 803.6, 820.5, 817.1, 801.2, 831.0, 797.5, 810.9, 825.8, 801.9, 816.4, 798.7, 824.9, 829.3, 821.9, 834.6, 811.9, 827.7, 823.8, 823.4, 818.4, 834.3, 821], "creator": "tGuS…ptFD", "mint": "aYPo…pump", "b0": 827}, {"n": "Paper Lantern", "t": "LANTERN", "H": 2874, "mu": 5.5, "R": 0.9, "Q": 1.25, "top10": 0.22, "age": 14.8, "mc": "$612K", "d": 9, "b": 751, "w": 0.97, "B": 2789, "reach": 0.77, "spread": 0.975, "spark": [null, null, null, null, null, null, null, null, null, 389.0, 448.7, 481.2, 537.1, 569.6, 608.5, 628.0, 631.6, 652.0, 676.0, 666.4, 691.9, 690.4, 696.0, 751], "creator": "22sJ…XHDm", "mint": "fPVt…pump", "b0": 742}, {"n": "Slow Burn", "t": "SLOW", "H": 2190, "mu": 9.3, "R": 0.94, "Q": 1.3, "top10": 0.24, "age": 36.7, "mc": "$403K", "d": -12, "b": 714, "w": 1.108, "B": 2426, "reach": 0.751, "spread": 0.95, "spark": [669.2, 693.2, 701.0, 677.7, 682.2, 687.3, 689.9, 701.0, 706.6, 696.7, 688.9, 704.7, 703.9, 711.8, 726.2, 717.5, 711.8, 715.8, 718.3, 696.4, 726.8, 722.8, 726.3, 714], "creator": "gzgv…1XiP", "mint": "ti6v…pump", "b0": 726}, {"n": "Tidepool", "t": "TIDE", "H": 2900, "mu": 4.9, "R": 0.88, "Q": 1.2, "top10": 0.27, "age": 12.1, "mc": "$744K", "d": 27, "b": 694, "w": 0.896, "B": 2598, "reach": 0.761, "spread": 0.912, "spark": [null, null, null, null, null, null, null, null, null, null, null, 322.9, 369.3, 419.7, 463.8, 510.6, 519.7, 554.5, 578.5, 606.5, 620.0, 634.4, 627.0, 694], "creator": "oPQ6…F7FX", "mint": "DNEX…pump", "b0": 667}, {"n": "Kettle", "t": "KETTLE", "H": 1844, "mu": 3.6, "R": 0.87, "Q": 1.2, "top10": 0.23, "age": 8.4, "mc": "$287K", "d": 5, "b": 663, "w": 0.83, "B": 1531, "reach": 0.689, "spread": 0.963, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 320.1, 372.3, 410.3, 459.2, 477.2, 503.6, 529.7, 547.4, 663], "creator": "j8Rs…nqDX", "mint": "yCUs…pump", "b0": 658}, {"n": "Dusk Mail", "t": "DUSK", "H": 1302, "mu": 5.0, "R": 0.9, "Q": 1.25, "top10": 0.26, "age": 17.3, "mc": "$191K", "d": -3, "b": 611, "w": 0.957, "B": 1246, "reach": 0.661, "spread": 0.925, "spark": [null, null, null, null, null, null, 293.0, 334.4, 377.2, 413.9, 443.8, 463.2, 502.0, 524.1, 525.8, 539.2, 539.2, 548.8, 563.3, 567.6, 589.5, 574.9, 574.7, 611], "creator": "B92A…ezWt", "mint": "iAgu…pump", "b0": 614}, {"n": "Oat Milk Capital", "t": "OAT", "H": 2467, "mu": 2.8, "R": 0.84, "Q": 1.15, "top10": 0.38, "age": 6.9, "mc": "$356K", "d": 31, "b": 548, "w": 0.711, "B": 1754, "reach": 0.707, "spread": 0.775, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 282.1, 320.2, 355.8, 382.9, 412.0, 424.9, 548], "creator": "hN6t…oSWS", "mint": "p6oB…pump", "b0": 517}, {"n": "Mooncrumb", "t": "CRUMB", "H": 1017, "mu": 3.2, "R": 0.86, "Q": 1.2, "top10": 0.29, "age": 5.6, "mc": "$144K", "d": 11, "b": 534, "w": 0.794, "B": 807, "reach": 0.602, "spread": 0.888, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 268.6, 303.6, 344.3, 364.0, 398.1, 534], "creator": "fXjP…Acc9", "mint": "21to…pump", "b0": 523}], "warming": [{"n": "Moss & Co", "t": "MOSS", "age_min": 34, "H": 11}, {"n": "Night Shift", "t": "NIGHT", "age_min": 52, "H": 14}, {"n": "Pebble", "t": "PEBBLE", "age_min": 19, "H": 6}], "ttable": [[0.25, "15 min", 0.132], [0.5, "30 min", 0.244], [1, "1 hour", 0.42], [2, "2 hours", 0.638], [3, "3 hours", 0.754], [6, "6 hours", 0.872], [12, "12 hours", 0.925], [24, "24 hours", 1.0]], "const": {"tau": 1.5, "fast": 0.85, "slow": 0.15, "dust": 10, "scale": 10, "bmax": 15000, "free": 0.2, "floor": 0.4}, "example": {"top": {"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}}};
+  // Contract address. Paste the BPAD mint address between the quotes when the coin launches.
+  // Leave it empty and the bar stays hidden.
+  const CA = '';
+  (function () {
+    const bar = document.getElementById('cabar');
+    if (!bar || !CA) return;
+    bar.hidden = false;
+    document.getElementById('caText').textContent = CA;
+    document.getElementById('caLink').href = 'https://pump.fun/coin/' + CA;
+    const btn = document.getElementById('caCopy');
+    btn.addEventListener('click', () => {
+      const done = () => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy', 1500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(CA).then(done, fallback);
+      else fallback();
+      function fallback() {
+        const r = document.createRange(); r.selectNodeContents(document.getElementById('caText'));
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        try { document.execCommand('copy'); done(); } catch (e) {} s.removeAllRanges();
+      }
+    });
+  })();
+
+  // Real wallet connect (Phantom, Solflare, Backpack). Exposes window.BP for the launch page.
+  window.BP = { publicKey: null, provider: null, listeners: [], onChange(f) { this.listeners.push(f); f(this.publicKey); } };
+  (function () {
+    const btn = document.getElementById('wallet');
+    if (!btn) return;
+    const find = () => (window.phantom && window.phantom.solana && window.phantom.solana.isPhantom && window.phantom.solana)
+      || (window.solflare && window.solflare.isSolflare && window.solflare)
+      || (window.backpack && window.backpack.solana) || (window.solana && window.solana.isPhantom && window.solana) || null;
+    const short = (k) => k.slice(0, 4) + '…' + k.slice(-4);
+    const set = (pk, provider) => {
+      BP.publicKey = pk; BP.provider = provider || BP.provider;
+      btn.textContent = pk ? short(pk) : 'Connect wallet';
+      BP.listeners.forEach((f) => f(pk));
+    };
+    async function connect(silent) {
+      const p = find();
+      if (!p) { if (!silent) window.open('https://phantom.app/download', '_blank', 'noopener'); return; }
+      try { const r = await p.connect(silent ? { onlyIfTrusted: true } : undefined); set((r.publicKey || p.publicKey).toString(), p); }
+      catch (e) { /* user closed the prompt */ }
+    }
+    btn.addEventListener('click', async () => {
+      if (BP.publicKey) { try { await BP.provider.disconnect(); } catch (e) {} set(null); } else connect(false);
+    });
+    window.addEventListener('load', () => connect(true));
+  })();
+
+  // gentle reveal on load and scroll
+  document.documentElement.classList.add('js');
+  document.addEventListener('DOMContentLoaded', () => {
+    const list = document.getElementById('list');
+    if (list) { list.classList.add('first'); setTimeout(() => list.classList.remove('first'), 1200); }
+    const groups = [
+      ['.hero h1, .hero .sub, .hero .cta, .hero .ring', 0.09],
+      ['.top > *, .tabs', 0.08],
+      ['.head, .how > div, .close > *, .pay > div, .warm > *, #rings .blk > *, article section > h2', 0.07],
+      ['#rows .row', 0.06],
+      ['article section > :not(h2)', 0],
+    ];
+    const els = [];
+    groups.forEach(([sel, step]) => {
+      document.querySelectorAll(sel).forEach((el, i) => {
+        if (el.classList.contains('rv') || el.closest('.calc, #list')) return;
+        el.classList.add('rv'); el.style.setProperty('--d', (step ? Math.min(i, 6) * step : 0) + 's'); els.push(el);
+      });
+    });
+    if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }), { rootMargin: '0px 0px -6% 0px' });
+    requestAnimationFrame(() => requestAnimationFrame(() => els.forEach(e => io.observe(e))));
+  });
+
+
+  // ---- same model as the board
+  const K = DATA.const;
+  const T = h => K.fast * (1 - Math.exp(-h / K.tau)) + K.slow * Math.min(h / 24, 1);
+  const reach = B => Math.min(1, Math.log10(1 + B / K.scale) / Math.log10(1 + K.bmax / K.scale));
+  const spread = t => Math.max(K.floor, 1 - Math.max(0, t - K.free) / 0.8);
+
+  // ---- calculator
+  (function () {
+    const $ = id => document.getElementById(id);
+    const H_MIN = 15, H_MAX = 20000, H0 = 1000;
+    const pos = H => Math.log(H / H_MIN) / Math.log(H_MAX / H_MIN) * 100;
+    const holders = () => Math.round(H_MIN * Math.pow(H_MAX / H_MIN, $('iH').value / 100));
+    $('iH').value = pos(H0);
+    const ring = 2 * Math.PI * 95, arc = $('cArc');
+    arc.style.strokeDasharray = ring;
+    const board = DATA.coins.map(c => ({ n: c.n, b: c.b }));
+    const hm = h => { const H = Math.floor(h), M = Math.round((h - H) * 60); return H + 'h ' + String(M).padStart(2, '0') + 'm'; };
+
+    function run() {
+      const H = holders(), mu = +$('iMu').value, R = +$('iR').value / 100, Q = +$('iQ').value, t = +$('iT').value / 100;
+      $('oH').textContent = H.toLocaleString('en-US');
+      $('oMu').textContent = hm(mu);
+      $('oR').textContent = Math.round(R * 100) + '%';
+      $('oT').textContent = Math.round(t * 100) + '%';
+      const w = T(mu) * R * Q, B = H * w, r = reach(B), s = spread(t), b = Math.round(1000 * r * s);
+      $('cNum').textContent = b;
+      arc.style.strokeDashoffset = ring * (1 - b / 1000);
+      let where;
+      if (H < 15) where = 'Needs 15 holders to be ranked.';
+      else if (b >= board[0].b) where = 'Would rank above ' + board[0].n + ' (' + board[0].b + ').';
+      else if (b < board[board.length - 1].b) where = 'Would rank below ' + board[board.length - 1].n + ' (' + board[board.length - 1].b + ') on today’s board.';
+      else {
+        const i = board.findIndex(c => c.b <= b);
+        where = 'Would rank #' + (i + 1) + ' on today’s board, between ' + board[i - 1].n + ' (' + board[i - 1].b + ') and ' + board[i].n + ' (' + board[i].b + ').';
+      }
+      $('cWhere').textContent = where;
+      $('cParts').innerHTML = 'Weight per holder ' + w.toFixed(2) + '<br>Belief points ' + Math.round(B).toLocaleString('en-US') + '<br>Reach ' + r.toFixed(3) + ' · Spread ' + s.toFixed(2);
+    }
+    ['iH', 'iMu', 'iR', 'iQ', 'iT'].forEach(id => $(id).addEventListener('input', run));
+    run();
+  })();
+
+  // ---- highlight the section in view
+  (function () {
+    const links = [...document.querySelectorAll('.toc a')];
+    const map = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (e.isIntersecting) { links.forEach(a => a.classList.remove('on')); const a = map.get(e.target.id); if (a) a.classList.add('on'); }
+      });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    document.querySelectorAll('article section').forEach(s => io.observe(s));
+  })();
+</script>
+</body>
+</html>
