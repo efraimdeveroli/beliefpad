@@ -22,6 +22,7 @@ try {
   const img = await fetch(`http://localhost:${port}/img/${prep.j.mint}`); t('image served', img.status === 200 && img.headers.get('content-type') === 'image/png');
   t('wrong creator cannot finish', (await call('POST', '/api/launch/finish', { mint: prep.j.mint, creator: 'EbW2sAyL1kWfBs9exwAgLuDQgVw5325KivYxsFnpxWMd' })).s === 400);
   const buy = await call('POST', '/api/launch/buy', { mint: prep.j.mint, creator, sol: 0.5 }); t('buy tx built', buy.s === 200);
+  const bd = (await call('GET', '/api/board')).j; t('board shape', bd && Array.isArray(bd.coins) && Array.isArray(bd.warming) && typeof bd.nextSnapshotAt === 'number');
   t('path traversal blocked', (await fetch(`http://localhost:${port}/..%2f..%2fetc/passwd`)).status === 404);
 } finally { srv.kill(); }
 process.exit(fails ? 1 : 0);

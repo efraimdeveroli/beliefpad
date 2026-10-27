@@ -7,6 +7,7 @@ import * as pinata from './lib/pinata.js';
 import * as pump from './lib/pump.js';
 import { parseLaunch, isPubkey } from './lib/validate.js';
 import { limited } from './lib/ratelimit.js';
+import { startTracker, boardData, runSnapshots } from './lib/tracker.js';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(__dir, 'public');
@@ -43,6 +44,7 @@ async function lockAndList(mint, creator) {
   const v = await pump.verifyLocked({ mint, creator, treasury: TREASURY });
   const status = v.ok ? 'locked' : 'created';
   store.upsertCoin({ mint, status, verifyNote: v.ok ? undefined : v.reason });
+  if (v.ok) setTimeout(() => runSnapshots().catch(() => {}), 20_000);   // first reading soon after listing
   return { ok: v.ok, status, reason: v.reason };
 }
 
@@ -55,6 +57,7 @@ async function relayChecked(txs, creator) {
 
 const routes = {
   'GET /api/config': async () => ({ treasury: TREASURY, creatorBps: pump.CREATOR_BPS, treasuryBps: pump.TREASURY_BPS, mock: MOCK }),
+  'GET /api/board': async () => boardData(),
   'GET /api/coins': async () => ({ coins: store.listCoins().map(publicCoin) }),
 
   'POST /api/launch/prepare': async (req) => {
@@ -147,5 +150,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`[server] listening on ${PORT}`);
+  if (!MOCK) startTracker();
   if (!MOCK && process.env.HELIUS_RPC_URL) pump.sdkReport().then((r) => console.log('[sdk]', JSON.stringify(r))).catch((e) => console.error('[sdk] load failed:', String(e.message).slice(0, 300)));
 });

@@ -216,6 +216,11 @@
   }
   @media (prefers-reduced-motion: reduce) { .score b.flash { animation: none; } .chev { transition: none; } }
 
+  .name .coin { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; margin-right: 10px; vertical-align: -7px; background: var(--wash); }
+  .empty { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 56px 0; text-align: center; color: var(--mute); }
+  .empty p { margin-bottom: 18px; }
+  .empty-note { color: var(--mute); }
+
 </style>
 </head>
 <body>
@@ -249,8 +254,8 @@
       <p class="lede">Every coin launched on Belief Pad, ranked by Belief out of 1,000. Select a coin to see how its score is built.</p>
     </div>
     <div class="clocks">
-      <div class="clock"><div class="k">Next snapshot</div><div class="v" id="snap">03:12</div></div>
-      <div class="clock"><div class="k">Next payout</div><div class="v" id="pay">00:41:07</div></div>
+      <div class="clock"><div class="k">Next snapshot</div><div class="v" id="snap">--:--</div></div>
+      <div class="clock"><div class="k">Coins ranked</div><div class="v" id="ranked">0</div></div>
     </div>
   </header>
 
@@ -265,21 +270,13 @@
   </div>
   <div id="list"></div>
 
-  <section class="blk" id="payouts">
-    <div class="head">
-      <h2 class="sec">Paid this hour</h2>
-      <div class="meta">Pool this hour: <span id="pool"></span> $BPAD. The daily pool so far is 1.11M $BPAD.</div>
-    </div>
-    <div class="pay" id="payGrid"></div>
-    <p class="note">The top three coins by average Belief across the hour share the hourly pool. Half of each coin's payout goes to its creator and half to its holders, split by how much each wallet added to the score. The ten best coins of the day share the daily pool. <a href="docs.html#rewards">How rewards work</a></p>
-  </section>
-
   <section class="blk" id="warming">
     <div class="head">
       <h2 class="sec">Warming up</h2>
       <div class="meta">Coins join the board after one hour and 15 holders.</div>
     </div>
     <div class="warm" id="warmGrid"></div>
+    <p class="empty-note" id="warmEmpty" hidden>No coins are warming up right now.</p>
   </section>
 
   <section class="blk" id="rings">
@@ -302,7 +299,6 @@
 
 
 <script>
-  const DATA = {"sybil": {"wallets": 500, "honest": 519, "clustered": 148, "eff": 22.4}, "coins": [{"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}, {"n": "Ironwill", "t": "IRON", "H": 4812, "mu": 6.2, "R": 0.91, "Q": 1.3, "top10": 0.19, "age": 19.5, "mc": "$968K", "d": 42, "b": 849, "w": 1.035, "B": 4982, "reach": 0.849, "spread": 1.0, "spark": [null, null, null, null, 411.9, 476.1, 536.0, 597.7, 618.4, 665.0, 695.8, 710.7, 737.5, 736.7, 750.9, 768.8, 798.0, 796.9, 799.8, 817.2, 817.2, 815.5, 839.8, 849], "creator": "brZN…hFgt", "mint": "sqwD…pump", "b0": 807}, {"n": "Quiet Hands", "t": "HANDS", "H": 3906, "mu": 8.1, "R": 0.96, "Q": 1.3, "top10": 0.21, "age": 40.2, "mc": "$1.08M", "d": -6, "b": 821, "w": 1.119, "B": 4372, "reach": 0.832, "spread": 0.988, "spark": [785.1, 802.2, 803.6, 820.5, 817.1, 801.2, 831.0, 797.5, 810.9, 825.8, 801.9, 816.4, 798.7, 824.9, 829.3, 821.9, 834.6, 811.9, 827.7, 823.8, 823.4, 818.4, 834.3, 821], "creator": "tGuS…ptFD", "mint": "aYPo…pump", "b0": 827}, {"n": "Paper Lantern", "t": "LANTERN", "H": 2874, "mu": 5.5, "R": 0.9, "Q": 1.25, "top10": 0.22, "age": 14.8, "mc": "$612K", "d": 9, "b": 751, "w": 0.97, "B": 2789, "reach": 0.77, "spread": 0.975, "spark": [null, null, null, null, null, null, null, null, null, 389.0, 448.7, 481.2, 537.1, 569.6, 608.5, 628.0, 631.6, 652.0, 676.0, 666.4, 691.9, 690.4, 696.0, 751], "creator": "22sJ…XHDm", "mint": "fPVt…pump", "b0": 742}, {"n": "Slow Burn", "t": "SLOW", "H": 2190, "mu": 9.3, "R": 0.94, "Q": 1.3, "top10": 0.24, "age": 36.7, "mc": "$403K", "d": -12, "b": 714, "w": 1.108, "B": 2426, "reach": 0.751, "spread": 0.95, "spark": [669.2, 693.2, 701.0, 677.7, 682.2, 687.3, 689.9, 701.0, 706.6, 696.7, 688.9, 704.7, 703.9, 711.8, 726.2, 717.5, 711.8, 715.8, 718.3, 696.4, 726.8, 722.8, 726.3, 714], "creator": "gzgv…1XiP", "mint": "ti6v…pump", "b0": 726}, {"n": "Tidepool", "t": "TIDE", "H": 2900, "mu": 4.9, "R": 0.88, "Q": 1.2, "top10": 0.27, "age": 12.1, "mc": "$744K", "d": 27, "b": 694, "w": 0.896, "B": 2598, "reach": 0.761, "spread": 0.912, "spark": [null, null, null, null, null, null, null, null, null, null, null, 322.9, 369.3, 419.7, 463.8, 510.6, 519.7, 554.5, 578.5, 606.5, 620.0, 634.4, 627.0, 694], "creator": "oPQ6…F7FX", "mint": "DNEX…pump", "b0": 667}, {"n": "Kettle", "t": "KETTLE", "H": 1844, "mu": 3.6, "R": 0.87, "Q": 1.2, "top10": 0.23, "age": 8.4, "mc": "$287K", "d": 5, "b": 663, "w": 0.83, "B": 1531, "reach": 0.689, "spread": 0.963, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 320.1, 372.3, 410.3, 459.2, 477.2, 503.6, 529.7, 547.4, 663], "creator": "j8Rs…nqDX", "mint": "yCUs…pump", "b0": 658}, {"n": "Dusk Mail", "t": "DUSK", "H": 1302, "mu": 5.0, "R": 0.9, "Q": 1.25, "top10": 0.26, "age": 17.3, "mc": "$191K", "d": -3, "b": 611, "w": 0.957, "B": 1246, "reach": 0.661, "spread": 0.925, "spark": [null, null, null, null, null, null, 293.0, 334.4, 377.2, 413.9, 443.8, 463.2, 502.0, 524.1, 525.8, 539.2, 539.2, 548.8, 563.3, 567.6, 589.5, 574.9, 574.7, 611], "creator": "B92A…ezWt", "mint": "iAgu…pump", "b0": 614}, {"n": "Oat Milk Capital", "t": "OAT", "H": 2467, "mu": 2.8, "R": 0.84, "Q": 1.15, "top10": 0.38, "age": 6.9, "mc": "$356K", "d": 31, "b": 548, "w": 0.711, "B": 1754, "reach": 0.707, "spread": 0.775, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 282.1, 320.2, 355.8, 382.9, 412.0, 424.9, 548], "creator": "hN6t…oSWS", "mint": "p6oB…pump", "b0": 517}, {"n": "Mooncrumb", "t": "CRUMB", "H": 1017, "mu": 3.2, "R": 0.86, "Q": 1.2, "top10": 0.29, "age": 5.6, "mc": "$144K", "d": 11, "b": 534, "w": 0.794, "B": 807, "reach": 0.602, "spread": 0.888, "spark": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 268.6, 303.6, 344.3, 364.0, 398.1, 534], "creator": "fXjP…Acc9", "mint": "21to…pump", "b0": 523}], "warming": [{"n": "Moss & Co", "t": "MOSS", "age_min": 34, "H": 11}, {"n": "Night Shift", "t": "NIGHT", "age_min": 52, "H": 14}, {"n": "Pebble", "t": "PEBBLE", "age_min": 19, "H": 6}], "ttable": [[0.25, "15 min", 0.132], [0.5, "30 min", 0.244], [1, "1 hour", 0.42], [2, "2 hours", 0.638], [3, "3 hours", 0.754], [6, "6 hours", 0.872], [12, "12 hours", 0.925], [24, "24 hours", 1.0]], "const": {"tau": 1.5, "fast": 0.85, "slow": 0.15, "dust": 10, "scale": 10, "bmax": 15000, "free": 0.2, "floor": 0.4}, "example": {"top": {"n": "Glasshouse", "t": "GLASS", "H": 6420, "mu": 7.7, "R": 0.93, "Q": 1.25, "top10": 0.17, "age": 31.0, "mc": "$1.42M", "d": 18, "b": 889, "w": 1.038, "B": 6666, "reach": 0.889, "spread": 1.0, "spark": [753.4, 766.3, 802.7, 793.5, 824.3, 827.4, 823.0, 849.2, 835.3, 857.4, 846.1, 850.6, 868.3, 888.5, 860.0, 866.3, 885.7, 901.2, 886.0, 879.0, 905.5, 865.0, 901.6, 889], "creator": "x6mw…HaQB", "mint": "PrFb…pump", "b0": 871}}};
   // Contract address. Paste the BPAD mint address between the quotes when the coin launches.
   // Leave it empty and the bar stays hidden.
   const CA = '';
@@ -378,23 +374,13 @@
   });
 
 
-  // ---- the Belief model, same constants and formula as the docs page
-  const K = DATA.const;
-  const T = h => K.fast * (1 - Math.exp(-h / K.tau)) + K.slow * Math.min(h / 24, 1);
-  const reach = B => Math.min(1, Math.log10(1 + B / K.scale) / Math.log10(1 + K.bmax / K.scale));
-  const spread = t => Math.max(K.floor, 1 - Math.max(0, t - K.free) / 0.8);
-  function model(c) {
-    const w = T(c.mu) * c.R * c.Q, B = c.H * w, r = reach(B), s = spread(c.top10);
-    return { w, B, r, s, b: 1000 * r * s };
-  }
-
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const coins = DATA.coins.map(c => ({ ...c, m: model(c), prev: null }));
-  coins.forEach(c => { c.val = Math.round(c.m.b); });
+  let coins = [], warming = [], nextAt = 0, sortBy = 'belief', openM = null, prev = {};
   const list = document.getElementById('list');
-  let sortBy = 'belief', openT = null;
-
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const fmt = n => Math.round(n).toLocaleString('en-US');
+  const usd = n => n >= 1e6 ? '$' + (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? '$' + (n / 1e3).toFixed(1) + 'K' : '$' + Math.round(n);
+  const short = s => s.slice(0, 4) + '…' + s.slice(-4);
   const hm = h => { let H = Math.floor(h), M = Math.round((h - H) * 60); if (M === 60) { H++; M = 0; } return H + 'h ' + String(M).padStart(2, '0') + 'm'; };
   const ageStr = h => h >= 24 ? Math.floor(h / 24) + 'd ' + Math.round(h % 24) + 'h' : hm(h);
   const sign = d => (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d);
@@ -421,25 +407,25 @@
     const s = sparkPath(c.spark, 600, 140, 8), last = s.xy[s.xy.length - 1];
     const grid = [0.25, 0.5, 0.75].map(f => `<line x1="0" x2="600" y1="${(140 * f).toFixed(0)}" y2="${(140 * f).toFixed(0)}" stroke="#E6E6EB" stroke-width="1" vector-effect="non-scaling-stroke"/>`).join('');
     const area = s.d + ` L${last[0]} 140 L${s.xy[0][0]} 140 Z`;
-    return `<svg viewBox="0 0 600 140" role="img" aria-label="Belief over the last 24 hours, from ${Math.round(s.lo)} to ${Math.round(s.hi)}">${grid}<path d="${area}" fill="#0B0B0F" fill-opacity=".05"/><path d="${s.d}" fill="none" stroke="#0B0B0F" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx="${last[0]}" cy="${last[1]}" r="4" fill="#0B0B0F"/></svg>
+    return `<svg viewBox="0 0 600 140" role="img" aria-label="Belief over the last 24 hours, from ${Math.round(s.lo)} to ${Math.round(s.hi)}">${grid}<path d="${area}" fill="#0B0B0F" fill-opacity=".05"/><path d="${s.d}" fill="none" stroke="#0B0B0F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/><circle cx="${last[0]}" cy="${last[1]}" r="3.5" fill="#0B0B0F"/></svg>
       <div class="axis"><span>${c.age < 24 ? 'Launched' : '24 hours ago'}</span><span>Low ${Math.round(s.lo)} · High ${Math.round(s.hi)}</span><span>Now</span></div>`;
   }
 
   function detail(c) {
-    const m = c.m, v = c.val, tier = tierOf(v);
-    return `<div class="detail" id="d-${c.t}" role="region" aria-label="${c.n} score breakdown">
+    const v = c.b, tier = tierOf(v);
+    return `<div class="detail" id="d-${c.mint}" role="region" aria-label="${esc(c.n)} score breakdown">
       <div>
         ${tier ? `<span class="tier">${ring(tier === 'Crown' ? .8 : tier === 'Diamond' ? .5 : .25, 16)}${tier}</span>` : ''}
         <h3>How this score is built</h3>
         <dl class="steps">
           <dt>Holders counted</dt><dd>${fmt(c.H)}</dd>
-          <dt>Typical hold time</dt><dd>${hm(c.mu)} <small>(time weight ${T(c.mu).toFixed(2)})</small></dd>
+          <dt>Average hold time</dt><dd>${hm(c.mu)}</dd>
           <dt>Position kept</dt><dd>${Math.round(c.R * 100)}%</dd>
-          <dt>Typical size tier</dt><dd>${c.Q.toFixed(2)}×</dd>
-          <dt>Weight per holder</dt><dd>${m.w.toFixed(2)}</dd>
-          <dt>Belief points</dt><dd>${fmt(m.B)}</dd>
-          <dt>Reach</dt><dd>${m.r.toFixed(3)}</dd>
-          <dt>Spread</dt><dd>${m.s.toFixed(2)} <small>(top 10 hold ${Math.round(c.top10 * 100)}%)</small></dd>
+          <dt>Average size tier</dt><dd>${c.Q.toFixed(2)}×</dd>
+          <dt>Weight per holder</dt><dd>${c.w.toFixed(2)}</dd>
+          <dt>Belief points</dt><dd>${fmt(c.B)}</dd>
+          <dt>Reach</dt><dd>${c.reach.toFixed(3)}</dd>
+          <dt>Spread</dt><dd>${c.spread.toFixed(2)} <small>(top 10 hold ${Math.round(c.top10 * 100)}%)</small></dd>
           <dt>Belief</dt><dd>${v}</dd>
         </dl>
         <a class="docslink" href="docs.html#belief">Read how Belief is scored</a>
@@ -447,45 +433,43 @@
       <div class="chart">
         <h3>Last 24 hours</h3>
         ${bigChart(c)}
-        <p class="facts">Launched <b>${ageStr(c.age)}</b> ago &middot; Market cap <b>${c.mc}</b><br>Creator <b>${c.creator}</b> &middot; Mint <b>${c.mint}</b></p>
+        <p class="facts">Launched <b>${ageStr(c.age)}</b> ago &middot; Market cap <b>${usd(c.mc)}</b><br>Creator <b>${short(c.creator)}</b> &middot; Mint <b>${short(c.mint)}</b> &middot; <a href="${esc(c.pump)}" target="_blank" rel="noopener">pump.fun</a></p>
       </div>
     </div>`;
   }
 
   function render() {
-    const focusT = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.t : null;
-    coins.forEach(c => { c.m = model(c); c.val = Math.round(c.m.b); c.d = c.val - c.b0; c.spark[23] = c.val; });
-    const sorted = [...coins].sort((a, z) =>
-      sortBy === 'belief' ? z.val - a.val : sortBy === 'rising' ? z.d - a.d : a.age - z.age);
+    document.getElementById('ranked').textContent = coins.length;
+    const focusM = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.m : null;
+    if (!coins.length) {
+      list.innerHTML = `<div class="empty"><p>${warming.length ? 'No coin has reached the board yet. Coins join after one hour and 15 holders.' : 'No coins have launched yet.'}</p><a class="btn-solid" href="launch.html">Launch a coin</a></div>`;
+      return;
+    }
+    const sorted = [...coins].sort((a, z) => sortBy === 'belief' ? z.b - a.b : sortBy === 'rising' ? z.d - a.d : a.age - z.age);
     list.innerHTML = sorted.map((c, i) => `
       <div class="item">
-        <button class="row" data-t="${c.t}" aria-expanded="${openT === c.t}" aria-controls="d-${c.t}">
+        <button class="row" data-m="${c.mint}" aria-expanded="${openM === c.mint}" aria-controls="d-${c.mint}">
           <span class="rank">${i + 1}</span>
-          <span class="name">${c.n}<small>$${c.t}</small></span>
+          <span class="name"><img class="coin" src="${esc(c.image)}" alt="" onerror="this.remove()">${esc(c.n)}<small>$${esc(c.t)}</small></span>
           <span class="spark">${sparkSVG(c)}</span>
-          <span class="score">${ring(c.val / 1000, 22)}<b data-v="${c.val}">${c.val}</b></span>
+          <span class="score">${ring(c.b / 1000, 22)}<b>${c.b}</b></span>
           <span class="delta tnum ${c.d >= 0 ? 'up' : 'down'}">${sign(c.d)}</span>
           <span class="num">${fmt(c.H)}</span>
           <span class="num">${hm(c.mu)}</span>
           <span class="chev"></span>
         </button>
-        ${openT === c.t ? detail(c) : ''}
+        ${openM === c.mint ? detail(c) : ''}
       </div>`).join('');
-    // flash scores that moved since the last paint
     if (!reduce) sorted.forEach(c => {
-      if (c.prev != null && c.prev !== c.val) {
-        const el = list.querySelector(`[data-t="${c.t}"] .score b`);
-        if (el) el.classList.add('flash');
-      }
+      if (prev[c.mint] != null && prev[c.mint] !== c.b) { const el = list.querySelector(`[data-m="${c.mint}"] .score b`); if (el) el.classList.add('flash'); }
     });
-    coins.forEach(c => { c.prev = c.val; });
-    if (focusT) { const f = list.querySelector(`[data-t="${focusT}"]`); if (f) f.focus({ preventScroll: true }); }
-    renderPayouts(sorted.slice().sort((a, z) => z.val - a.val));
+    coins.forEach(c => { prev[c.mint] = c.b; });
+    if (focusM) { const f = list.querySelector(`[data-m="${focusM}"]`); if (f) f.focus({ preventScroll: true }); }
   }
 
   list.addEventListener('click', e => {
     const b = e.target.closest('.row'); if (!b) return;
-    openT = openT === b.dataset.t ? null : b.dataset.t;
+    openM = openM === b.dataset.m ? null : b.dataset.m;
     render();
   });
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
@@ -494,55 +478,36 @@
     render();
   }));
 
-  // ---- payouts (top 3 by Belief; shares 50 / 30 / 20 of the hourly pool)
-  const POOL = 41200, SHARES = [0.5, 0.3, 0.2], PLACES = ['First', 'Second', 'Third'];
-  function renderPayouts(byBelief) {
-    document.getElementById('pool').textContent = fmt(POOL);
-    document.getElementById('payGrid').innerHTML = byBelief.slice(0, 3).map((c, i) => {
-      const amt = POOL * SHARES[i];
-      return `<div><div class="place">${PLACES[i]} · ${Math.round(SHARES[i] * 100)}% of the pool</div>
-        <div class="who">${c.n}<small>$${c.t}</small></div>
-        <div class="amt">${fmt(amt)}<small>$BPAD</small></div>
-        <div class="split">${fmt(amt / 2)} to the creator, ${fmt(amt / 2)} to holders</div></div>`;
+  function renderWarming() {
+    document.getElementById('warmEmpty').hidden = warming.length > 0;
+    document.getElementById('warmGrid').innerHTML = warming.map(w => {
+      const tPct = Math.min(100, w.age_min / 60 * 100), hPct = Math.min(100, w.H / 15 * 100);
+      return `<div><div class="who">${esc(w.n)}<small>$${esc(w.t)}</small></div>
+        <div class="prog">
+          <div>${Math.min(w.age_min, 60)} of 60 minutes</div><div class="bar"><i class="${tPct >= 100 ? 'done' : ''}" style="width:${tPct}%"></i></div>
+          <div>${w.H} of 15 holders</div><div class="bar"><i class="${hPct >= 100 ? 'done' : ''}" style="width:${hPct}%"></i></div>
+        </div></div>`;
     }).join('');
   }
 
-  // ---- warming up
-  document.getElementById('warmGrid').innerHTML = DATA.warming.map(w => {
-    const tPct = Math.min(100, w.age_min / 60 * 100), hPct = Math.min(100, w.H / 15 * 100);
-    return `<div><div class="who">${w.n}<small>$${w.t}</small></div>
-      <div class="prog">
-        <div>${w.age_min} of 60 minutes</div><div class="bar"><i class="${tPct >= 100 ? 'done' : ''}" style="width:${tPct}%"></i></div>
-        <div>${w.H} of 15 holders</div><div class="bar"><i class="${hPct >= 100 ? 'done' : ''}" style="width:${hPct}%"></i></div>
-      </div></div>`;
-  }).join('');
-
-  // ---- ring legend
+  // ring legend
   document.getElementById('legend').innerHTML = [['Lit', 250, .25], ['Diamond', 500, .5], ['Crown', 800, .8]]
     .map(([n, v, f]) => `<div>${ring(f, 28)}<div><b>${n}</b><span>${v}+ Belief</span></div></div>`).join('');
 
-  // ---- clocks and live movement
-  const pad = n => String(n).padStart(2, '0');
-  let snap = 192, pay = 41 * 60 + 7;
-  const rnd = (a, z) => a + Math.random() * (z - a);
-  function nudge(big) {
-    const n = big ? 4 : 1;
-    for (let k = 0; k < n; k++) {
-      const c = coins[Math.floor(Math.random() * coins.length)];
-      if (big) { c.H = Math.max(40, Math.round(c.H * (1 + rnd(-.04, .08)))); c.mu = Math.max(.5, c.mu + rnd(-.3, .5)); c.R = Math.min(.99, Math.max(.6, c.R + rnd(-.015, .015))); }
-      else { c.H += Math.round(rnd(20, 90)); }
-    }
-    render();
+  // load, then refresh every minute; the clock counts down to the next 5-minute snapshot
+  async function load() {
+    try {
+      const d = await (await fetch('/api/board', { cache: 'no-store' })).json();
+      coins = d.coins; warming = d.warming; nextAt = d.nextSnapshotAt;
+      render(); renderWarming();
+    } catch (e) { /* keep what is on screen */ }
   }
-  render();
+  const pad = n => String(n).padStart(2, '0');
+  load(); setInterval(load, 60000);
   setInterval(() => {
-    snap--; pay--;
-    if (pay < 0) pay = 3599;
-    if (snap < 0) { snap = 299; if (!reduce) nudge(true); }
-    document.getElementById('snap').textContent = pad(Math.floor(snap / 60)) + ':' + pad(snap % 60);
-    document.getElementById('pay').textContent = '00:' + pad(Math.floor(pay / 60)) + ':' + pad(pay % 60);
+    const s = nextAt ? Math.max(0, Math.round((nextAt - Date.now()) / 1000)) : null;
+    document.getElementById('snap').textContent = s == null ? '--:--' : pad(Math.floor(s / 60)) + ':' + pad(s % 60);
   }, 1000);
-  if (!reduce) setInterval(() => nudge(false), 6000);
 </script>
 </body>
 </html>
