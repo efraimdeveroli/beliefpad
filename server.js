@@ -90,7 +90,10 @@ const routes = {
     if (limited('send:' + ip(req), 30, 3600e3)) throw Object.assign(new Error('Too many requests.'), { status: 429 });
     let signatures;
     try { signatures = await relayChecked(b.txs, b.creator); }
-    catch (e) { e.status = e.status || 502; throw e; }
+    catch (e) {
+      if (e.timeout) { store.upsertCoin({ mint: b.mint, status: 'created', signatures: [e.sig] }); return { ok: false, pending: true, status: 'created', signatures: [e.sig], reason: e.message }; }
+      e.status = e.status || 502; throw e;
+    }
     store.upsertCoin({ mint: b.mint, status: 'created', signatures });
     const r = await lockAndList(b.mint, b.creator);
     return { signatures, ...r };
@@ -101,6 +104,7 @@ const routes = {
     const b = await readJson(req, 4e3);
     const coin = isPubkey(b.mint) && store.getCoin(b.mint);
     if (!coin || coin.creator !== b.creator || coin.status === 'locked') throw Object.assign(new Error('Nothing to finish for this coin.'), { status: 400 });
+    if (!MOCK && !(await pump.curveReserves(b.mint).catch(() => null))) throw Object.assign(new Error('Your coin did not land on Solana. Nothing was charged. Launch again.'), { status: 409 });
     prepared.set(b.mint, { creator: b.creator, at: Date.now() });
     const r = await pump.buildLock({ creator: b.creator, mint: b.mint, treasury: TREASURY });
     return { mint: b.mint, txs: r.txs };

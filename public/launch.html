@@ -437,7 +437,7 @@
       const sent = await api('/api/launch/send', { mint, creator: pub, txs: signed });
       step('chain', 'done'); step('verify', sent.ok ? 'done' : 'bad');
       try { localStorage.setItem('bp:pending', JSON.stringify({ mint, creator: pub })); } catch (_) {}
-      if (!sent.ok) return finishPrompt(mint, sent.reason);
+      if (!sent.ok) return finishPrompt(mint, sent.reason, sent.pending);
       try { localStorage.removeItem('bp:pending'); } catch (_) {}
       done(mint, body.name, body.buySol);
     } catch (ex) {
@@ -449,9 +449,9 @@
     } finally { busy = false; sync(); }
   });
 
-  function finishPrompt(mint, reason) {
+  function finishPrompt(mint, reason, pending) {
     const r = $('result'); r.hidden = false;
-    r.innerHTML = `<h2>One step left</h2><p>Your coin was created, but its fee split is not locked yet (${reason || 'not confirmed'}). It joins the board once you finish.</p>
+    r.innerHTML = `<h2>One step left</h2><p>${pending ? 'Solana is slow right now. ' + (reason || '') + ' Once it lands, press the button to lock the fee split. It joins the board after that.' : 'Your coin was created, but its fee split is not locked yet (' + (reason || 'not confirmed') + '). It joins the board once you finish.'}</p>
       <button class="btn-solid" id="finish" type="button">Finish setup</button><p class="err" id="finErr"></p>`;
     $('finish').onclick = async () => {
       $('finish').disabled = true; $('finErr').textContent = '';
